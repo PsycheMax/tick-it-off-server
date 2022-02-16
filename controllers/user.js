@@ -2,6 +2,9 @@ const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
 const Users = require("../models/User");
 
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 let userController = {};
 
 userController.getRoot = async function (req, res) {
@@ -13,7 +16,7 @@ userController.getRoot = async function (req, res) {
         res.send(toReturn);
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -30,19 +33,23 @@ userController.getID = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
-
 }
 
-userController.post = async function (req, res) {
+userController.postNewUser = async function (req, res) {
     // The next declaration saves a lot of time retyping stuff when changing the way data is submitted to the API
     let reqUser = req.body.newUser;
     try {
+        const existingUser = await Users.findOne({ email: reqUser.email });
+        // if (existingUser) {
+        //     return res.status(409).send("This email cannot be used.");
+        // }
+        let encryptedPassword = await bcrypt.hash(reqUser.password, 10);
         let newUser = new Users({
             username: reqUser.username,
-            password: reqUser.password,
-            email: reqUser.email,
+            password: encryptedPassword,
+            email: reqUser.email.toLowerCase(),
             image: reqUser.image,
             status: "Active",
             creationDate: Date.now(),
@@ -62,10 +69,48 @@ userController.post = async function (req, res) {
             notifications: []
         });
         await newUser.save();
-        res.send("This is the user ID " + newUser._id);
+        const token = jwt.sign({
+            user_id: newUser._id, email: reqUser.email
+        }, process.env.TOKEN_KEY, {
+            expiresIn: '1h'
+        });
+        newUser.token = token;
+        res.status(201).json(newUser);
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
+    }
+}
+
+userController.login = async function (req, res) {
+    try {
+        const { email, password } = req.body.loginUser;
+        if (!(email && password)) {
+            res.status(400).send("Please fill all the input fields");
+        }
+        const userToLogin = await Users.findOne({ email: email });
+        if (userToLogin && (await bcrypt.compare(password, userToLogin.password))) {
+            const token = jwt.sign({
+                user_id: userToLogin._id, email: email
+            }, process.env.TOKEN_KEY, {
+                expiresIn: '1h'
+            });
+            userToLogin.token = token;
+            res.status(200).json(userToLogin);
+        } else {
+            res.status(400).send("Invalid Credentials");
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+userController.logout = async function (req, res) {
+    try {
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
     }
 }
 
@@ -86,7 +131,7 @@ userController.patch = async function (req, res) {
     } catch (error) {
         console.log(req.body);
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -107,7 +152,7 @@ userController.delete = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -123,7 +168,7 @@ userController.getUserSettings = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 userController.setUserSettings = async function (req, res) {
@@ -140,7 +185,7 @@ userController.setUserSettings = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 

@@ -13,7 +13,7 @@ projectController.getRoot = async function (req, res) {
         res.send(toReturn);
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -30,9 +30,8 @@ projectController.getID = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
-
 }
 
 projectController.post = async function (req, res) {
@@ -60,7 +59,7 @@ projectController.post = async function (req, res) {
         res.send("This is the project ID " + newProject._id);
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -81,7 +80,7 @@ projectController.patch = async function (req, res) {
     } catch (error) {
         console.log(req.body);
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -102,7 +101,7 @@ projectController.delete = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -118,7 +117,7 @@ projectController.getUserSettings = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 projectController.setUserSettings = async function (req, res) {
@@ -135,7 +134,7 @@ projectController.setUserSettings = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 

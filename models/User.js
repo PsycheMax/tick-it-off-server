@@ -79,7 +79,10 @@ const UserSchema = new Schema({
     notifications: [{
         type: Schema.Types.ObjectId,
         ref: 'Notifications'
-    }]
+    }],
+    token: {
+        type: String
+    }
 })
 
 const Users = mongoose.model('Users', UserSchema, 'TaskManager_User');

@@ -13,7 +13,7 @@ taskController.getRoot = async function (req, res) {
         res.send(toReturn);
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -30,9 +30,8 @@ taskController.getID = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
-
 }
 
 taskController.post = async function (req, res) {
@@ -64,7 +63,7 @@ taskController.post = async function (req, res) {
         res.send("This is the Task ID " + newTask._id);
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -85,7 +84,7 @@ taskController.patch = async function (req, res) {
     } catch (error) {
         console.log(req.body);
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -106,7 +105,7 @@ taskController.delete = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -122,7 +121,7 @@ taskController.getTaskSettings = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 taskController.setTaskSettings = async function (req, res) {
@@ -139,7 +138,7 @@ taskController.setTaskSettings = async function (req, res) {
         }
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(500).send(error);
     }
 }
 
