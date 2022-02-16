@@ -1,6 +1,9 @@
 const express = require('express');
 const userController = require('../controllers/user');
+const auth = require('../middleware/auth');
 const router = express.Router();
+
+
 
 router.route('/')
     .get(userController.getRoot)
@@ -13,12 +16,12 @@ router.route('/logout')
     .post(userController.logout);
 
 router.route('/:id')
-    .get(userController.getID)
-    .patch(userController.patch)
-    .delete(userController.delete);
+    .get(auth, userController.getID)
+    .patch(auth, userController.patch)
+    .delete(auth, userController.delete);
 
 router.route('/:id/settings')
-    .get(userController.getUserSettings)
-    .post(userController.setUserSettings);
+    .get(auth, userController.getUserSettings)
+    .post(auth, userController.setUserSettings);
 
 module.exports = router;

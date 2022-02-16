@@ -107,6 +107,22 @@ userController.login = async function (req, res) {
 }
 userController.logout = async function (req, res) {
     try {
+        const existingToken = req.body.token || req.query.token || req.headers["x-access-token"];
+        if (existingToken) {
+            console.log(existingToken);
+            let decoded = jwt.decode(existingToken, { complete: true });
+            console.log(decoded);
+            let loggedUser = await Users.findOne({ _id: decoded.payload.user_id });
+            const logoutToken = jwt.sign({
+                user_id: " ", email: " "
+            }, process.env.TOKEN_KEY, {
+                expiresIn: "10"
+            })
+            loggedUser.token = logoutToken;
+            res.status(200).json(logoutToken);
+        } else {
+            res.status(200).send("Logged out");
+        }
 
     } catch (error) {
         console.log(error);
