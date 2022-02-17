@@ -2,7 +2,10 @@ const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
 const User = require("../models/User");
 
+const decodeLoggedUser = require('../middleware/decodeLoggedUser');
+
 let taskController = {};
+
 
 taskController.getRoot = async function (req, res) {
     let toReturn = "Get Task Page";

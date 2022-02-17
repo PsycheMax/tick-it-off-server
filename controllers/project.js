@@ -2,6 +2,22 @@ const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
 const User = require("../models/User");
 
+function checkIfReadable(project, loggedUser) {
+    for (const key in project.users) {
+        if (Object.hasOwnProperty.call(project.users, key)) {
+            const usersInRoleArray = project.users[key];
+            for (let i = 0; i < usersInRoleArray.length; i++) {
+                const user = usersInRoleArray[i];
+                if (user._id.toString() === loggedUser._id.toString()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+}
+
 let projectController = {};
 
 projectController.getRoot = async function (req, res) {
@@ -10,7 +26,11 @@ projectController.getRoot = async function (req, res) {
     try {
         let toReturn = await Projects.find({});
         console.log(toReturn);
-        res.send(toReturn);
+        if (checkIfReadable(toReturn, req.loggedUser)) {
+            res.status(200).send(toReturn);
+        } else {
+            res.status(403).send("You lack the authorization to perform this operation");
+        }
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
@@ -24,9 +44,10 @@ projectController.getID = async function (req, res) {
         let toReturn = await Projects.findById(id);
         console.log(toReturn);
         if (toReturn) {
-            res.send(toReturn);
+
+            res.status(200).send(toReturn);
         } else {
-            res.send("Project not found");
+            res.status(404).send("Project not found");
         }
     } catch (error) {
         console.log(error);

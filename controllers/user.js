@@ -90,6 +90,8 @@ userController.login = async function (req, res) {
         }
         const userToLogin = await Users.findOne({ email: email });
         if (userToLogin && (await bcrypt.compare(password, userToLogin.password))) {
+            userToLogin.lastLogin = Date.now();
+            await userToLogin.save();
             const token = jwt.sign({
                 user_id: userToLogin._id, email: email
             }, process.env.TOKEN_KEY, {
@@ -107,12 +109,7 @@ userController.login = async function (req, res) {
 }
 userController.logout = async function (req, res) {
     try {
-        const existingToken = req.body.token || req.query.token || req.headers["x-access-token"];
-        if (existingToken) {
-            console.log(existingToken);
-            let decoded = jwt.decode(existingToken, { complete: true });
-            console.log(decoded);
-            let loggedUser = await Users.findOne({ _id: decoded.payload.user_id });
+        if (req.loggedUser) {
             const logoutToken = jwt.sign({
                 user_id: " ", email: " "
             }, process.env.TOKEN_KEY, {
@@ -121,9 +118,8 @@ userController.logout = async function (req, res) {
             loggedUser.token = logoutToken;
             res.status(200).json(logoutToken);
         } else {
-            res.status(200).send("Logged out");
+            res.status(200).send("Already logged out");
         }
-
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
@@ -136,14 +132,18 @@ userController.patch = async function (req, res) {
     patchedUser.modificationDate = Date.now();
     try {
         const toUpdate = await Users.findById(id);
-        // The following for...in iterates through the PATCHEDJsonObject received by the request, and updates the DB Document with the eventual new data
-        for (const key in patchedUser) {
-            if (Object.hasOwnProperty.call(patchedUser, key)) {
-                toUpdate[key] = patchedUser[key];
+        if (req.loggedUser._id.toString() === toUpdate._id.toString()) {
+            // The following for...in iterates through the PATCHEDJsonObject received by the request, and updates the DB Document with the eventual new data
+            for (const key in patchedUser) {
+                if (Object.hasOwnProperty.call(patchedUser, key)) {
+                    toUpdate[key] = patchedUser[key];
+                }
             }
+            await toUpdate.save();
+            res.send(toUpdate);
+        } else {
+            res.status(403).send("You lack the authorization to perform this operation");
         }
-        await toUpdate.save();
-        res.send(toUpdate);
     } catch (error) {
         console.log(req.body);
         console.log(error);
@@ -158,13 +158,16 @@ userController.delete = async function (req, res) {
 
     try {
         const toDelete = await Users.findById(id);
-        // if (toDelete._id === req.session.userID){ }
         if (toDelete) {
-            toDelete.status = "Inactive";
-            await toDelete.save();
-            res.send("User " + id + "has been deactivated");
+            if (req.loggedUser._id.toString() === toDelete._id.toString()) {
+                toDelete.status = "Inactive";
+                await toDelete.save();
+                res.send("User " + id + "has been deactivated");
+            } else {
+                res.status(403).send("You lack the authorization to perform this operation");
+            }
         } else {
-            res.send("User not found");
+            res.status(404).send("User not found");
         }
     } catch (error) {
         console.log(error);
@@ -172,15 +175,20 @@ userController.delete = async function (req, res) {
     }
 }
 
+
 userController.getUserSettings = async function (req, res) {
     const { id } = req.params;
     try {
         const user = await Users.findById(id);
         if (user) {
-            const settings = user.settings;
-            res.send(settings);
+            if (req.loggedUser._id.toString() === user._id.toString()) {
+                const settings = user.settings;
+                res.send(settings);
+            } else {
+                res.status(403).send("You lack the authorization to perform this operation");
+            }
         } else {
-            res.send("User not found");
+            res.status(404).send("User not found");
         }
     } catch (error) {
         console.log(error);
@@ -193,11 +201,15 @@ userController.setUserSettings = async function (req, res) {
     try {
         const user = await Users.findById(id);
         if (user) {
-            user.settings = newSettings;
-            user.save();
-            res.send("Settings updated");
+            if (req.loggedUser._id.toString() === user._id.toString()) {
+                user.settings = newSettings;
+                user.save();
+                res.send("Settings updated");
+            } else {
+                res.status(403).send("You lack the authorization to perform this operation");
+            }
         } else {
-            res.send("User not found");
+            res.status(404).send("User not found");
         }
     } catch (error) {
         console.log(error);

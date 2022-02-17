@@ -1,31 +1,33 @@
 const express = require('express');
 const projectController = require('../controllers/project');
 const taskController = require('../controllers/task');
+const auth = require('../middleware/auth');
+const decodeLoggedUser = require('../middleware/decodeLoggedUser');
 const router = express.Router();
 
 router.route('/')
     .get(projectController.getRoot)
-    .post(projectController.post);
+    .post(auth, decodeLoggedUser, projectController.post);
 
 router.route('/:id')
-    .get(projectController.getID)
-    .patch(projectController.patch)
-    .delete(projectController.delete);
+    .get(auth, decodeLoggedUser, projectController.getID)
+    .patch(auth, decodeLoggedUser, projectController.patch)
+    .delete(auth, decodeLoggedUser, projectController.delete);
 
 router.route('/:id/settings')
-    .get(projectController.getUserSettings)
-    .post(projectController.setUserSettings);
+    .get(auth, decodeLoggedUser, projectController.getUserSettings)
+    .post(auth, decodeLoggedUser, projectController.setUserSettings);
 
 router.route('/:id/task')
-    .post(taskController.post);
+    .post(auth, decodeLoggedUser, taskController.post);
 
 router.route('/:id/task/:taskid')
-    .get(taskController.getID)
-    .patch(taskController.patch)
-    .delete(taskController.delete);
+    .get(auth, decodeLoggedUser, taskController.getID)
+    .patch(auth, decodeLoggedUser, taskController.patch)
+    .delete(auth, decodeLoggedUser, taskController.delete);
 
 router.route('/:id/task/:taskid/settings')
-    .get(taskController.getTaskSettings)
-    .patch(taskController.setTaskSettings);
+    .get(auth, decodeLoggedUser, taskController.getTaskSettings)
+    .patch(auth, decodeLoggedUser, taskController.setTaskSettings);
 
 module.exports = router;
