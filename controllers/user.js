@@ -4,6 +4,7 @@ const Users = require("../models/User");
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { encrypt, compare } = require("../utils/passwordLogic");
 
 let userController = {};
 
@@ -45,7 +46,7 @@ userController.postNewUser = async function (req, res) {
         // if (existingUser) {
         //     return res.status(409).send("This email cannot be used.");
         // }
-        let encryptedPassword = await bcrypt.hash(reqUser.password, 10);
+        let encryptedPassword = await encrypt(reqUser.password);
         let newUser = new Users({
             username: reqUser.username,
             password: encryptedPassword,
@@ -55,15 +56,16 @@ userController.postNewUser = async function (req, res) {
             creationDate: Date.now(),
             modificationDate: Date.now(),
             projects: {
-                createdProjects: [],
-                joinedProjects: [],
-                managedProjects: [],
+                created: [],
+                joined: [],
+                managed: [],
+                completed: []
             },
             tasks: {
-                createdTasks: [],
-                assignedTasks: [],
-                managedTasks: [],
-                completedTasks: []
+                created: [],
+                assigned: [],
+                managed: [],
+                completed: []
             },
             settings: {},
             notifications: []
@@ -89,7 +91,7 @@ userController.login = async function (req, res) {
             res.status(400).send("Please fill all the input fields");
         }
         const userToLogin = await Users.findOne({ email: email });
-        if (userToLogin && (await bcrypt.compare(password, userToLogin.password))) {
+        if (userToLogin && (await compare(password, userToLogin.password))) {
             userToLogin.lastLogin = Date.now();
             await userToLogin.save();
             const token = jwt.sign({
@@ -130,6 +132,7 @@ userController.patch = async function (req, res) {
     const { id } = req.params;
     const { patchedUser } = req.body;
     patchedUser.modificationDate = Date.now();
+    patchedUser.password = await encrypt(patchedUser.password);
     try {
         const toUpdate = await Users.findById(id);
         if (req.loggedUser._id.toString() === toUpdate._id.toString()) {

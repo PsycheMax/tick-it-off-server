@@ -1,8 +1,8 @@
 const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
-const User = require("../models/User");
+const Users = require("../models/User");
 
-function checkIfReadable(project, loggedUser) {
+function canLoggedUserReadThis(project, loggedUser) {
     for (const key in project.users) {
         if (Object.hasOwnProperty.call(project.users, key)) {
             const usersInRoleArray = project.users[key];
@@ -10,12 +10,23 @@ function checkIfReadable(project, loggedUser) {
                 const user = usersInRoleArray[i];
                 if (user._id.toString() === loggedUser._id.toString()) {
                     return true;
-                } else {
-                    return false;
                 }
             }
+            return false;
         }
     }
+}
+function canLoggedUserManageThis(project, loggedUser) {
+    console.log(project);
+    console.log(loggedUser);
+    const managersArray = project.users["managers"];
+    for (let i = 0; i < managersArray.length; i++) {
+        const userInArray = managersArray[i];
+        if (userInArray._id.toString() === loggedUser._id.toString()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 let projectController = {};
@@ -26,7 +37,7 @@ projectController.getRoot = async function (req, res) {
     try {
         let toReturn = await Projects.find({});
         console.log(toReturn);
-        if (checkIfReadable(toReturn, req.loggedUser)) {
+        if (toReturn) {
             res.status(200).send(toReturn);
         } else {
             res.status(403).send("You lack the authorization to perform this operation");
@@ -44,8 +55,11 @@ projectController.getID = async function (req, res) {
         let toReturn = await Projects.findById(id);
         console.log(toReturn);
         if (toReturn) {
-
-            res.status(200).send(toReturn);
+            if (canLoggedUserReadThis(toReturn, req.loggedUser)) {
+                res.status(200).send(toReturn);
+            } else {
+                res.status(403).send("You lack the authorization to perform this operation");
+            }
         } else {
             res.status(404).send("Project not found");
         }
@@ -68,16 +82,16 @@ projectController.post = async function (req, res) {
             creationDate: Date.now(),
             modificationDate: Date.now(),
             users: {
-                creators: [],
+                creators: [req.loggedUser._id],
                 joiners: [],
-                managers: [],
+                managers: [req.loggedUser._id],
             },
             tasks: [],
             settings: {},
             notifications: []
         });
         await newProject.save();
-        res.send("This is the project ID " + newProject._id);
+        res.status(200).send("This is the project ID " + newProject._id);
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
@@ -87,17 +101,24 @@ projectController.post = async function (req, res) {
 projectController.patch = async function (req, res) {
     const { id } = req.params;
     const { patchedProject } = req.body;
-    patchedProject.modificationDate = Date.now();
     try {
         const toUpdate = await Projects.findById(id);
-        // The following for...in iterates through the PATCHEDJsonObject received by the request, and updates the DB Document with the eventual new data
-        for (const key in patchedProject) {
-            if (Object.hasOwnProperty.call(patchedProject, key)) {
-                toUpdate[key] = patchedProject[key];
+        if (toUpdate) {
+            if (canLoggedUserManageThis(toUpdate, req.loggedUser)) {
+                // The following for...in iterates through the PATCHEDJsonObject received by the request, and updates the DB Document with the eventual new data
+                for (const key in patchedProject) {
+                    if (Object.hasOwnProperty.call(patchedProject, key)) {
+                        toUpdate[key] = patchedProject[key];
+                    }
+                }
+                await toUpdate.save();
+                res.status(200).send(toUpdate);
+            } else {
+                res.status(403).send("You lack the authorization to perform this operation");
             }
+        } else {
+            res.status(404).send("Project not found");
         }
-        await toUpdate.save();
-        res.send(toUpdate);
     } catch (error) {
         console.log(req.body);
         console.log(error);
@@ -114,9 +135,14 @@ projectController.delete = async function (req, res) {
         const toDelete = await Projects.findById(id);
         // if (toDelete._id === req.session.userID){ }
         if (toDelete) {
-            toDelete.status = "Inactive";
-            await toDelete.save();
-            res.send("Project " + id + "has been deactivated");
+            if (canLoggedUserManageThis(toDelete, req.loggedUser)) {
+                toDelete.status = "Inactive";
+                toDelete.modificationDate = Date.now();
+                await toDelete.save();
+                res.status(200).send("Project " + id + "has been deactivated");
+            } else {
+                res.status(403).send("You lack the authorization to perform this operation");
+            }
         } else {
             res.send("Project not found");
         }
@@ -126,13 +152,17 @@ projectController.delete = async function (req, res) {
     }
 }
 
-projectController.getUserSettings = async function (req, res) {
+projectController.getProjectSettings = async function (req, res) {
     const { id } = req.params;
     try {
         const project = await Projects.findById(id);
         if (project) {
-            const settings = project.settings;
-            res.send(settings);
+            if (canLoggedUserReadThis(project, req.loggedUser)) {
+                const settings = project.settings;
+                res.status(200).send(settings);
+            } else {
+                res.status(403).send("You lack the authorization to perform this operation");
+            }
         } else {
             res.send("Project not found");
         }
@@ -141,15 +171,20 @@ projectController.getUserSettings = async function (req, res) {
         res.status(500).send(error);
     }
 }
-projectController.setUserSettings = async function (req, res) {
+projectController.setProjectSettings = async function (req, res) {
     const { id } = req.params;
     const { newSettings } = req.body;
     try {
         const project = await Projects.findById(id);
         if (project) {
-            project.settings = newSettings;
-            project.save();
-            res.send("Settings updated");
+            if (canLoggedUserManageThis(project, req.loggedUser)) {
+                project.settings = newSettings;
+                project.modificationDate = Date.now();
+                project.save();
+                res.status(200).send("Settings updated");
+            } else {
+                res.status(403).send("You lack the authorization to perform this operation");
+            }
         } else {
             res.send("User not found");
         }

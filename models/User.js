@@ -39,33 +39,37 @@ const UserSchema = new Schema({
         default: Date.now
     },
     projects: {
-        createdProjects: [{
+        created: [{
             type: Schema.Types.ObjectId,
             ref: 'Projects'
         }],
-        joinedProjects: [{
+        joined: [{
             type: Schema.Types.ObjectId,
             ref: 'Projects'
         }],
-        managedProjects: [{
+        managed: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Projects'
+        }],
+        completed: [{
             type: Schema.Types.ObjectId,
             ref: 'Projects'
         }]
     },
     tasks: {
-        createdTasks: [{
+        created: [{
             type: Schema.Types.ObjectId,
             ref: 'Tasks'
         }],
-        assignedTasks: [{
+        assigned: [{
             type: Schema.Types.ObjectId,
             ref: 'Tasks'
         }],
-        managedTasks: [{
+        managed: [{
             type: Schema.Types.ObjectId,
             ref: 'Tasks'
         }],
-        completedTasks: [{
+        completed: [{
             type: Schema.Types.ObjectId,
             ref: 'Tasks'
         }],

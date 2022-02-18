@@ -15,8 +15,8 @@ router.route('/:id')
     .delete(auth, decodeLoggedUser, projectController.delete);
 
 router.route('/:id/settings')
-    .get(auth, decodeLoggedUser, projectController.getUserSettings)
-    .post(auth, decodeLoggedUser, projectController.setUserSettings);
+    .get(auth, decodeLoggedUser, projectController.getProjectSettings)
+    .post(auth, decodeLoggedUser, projectController.setProjectSettings);
 
 router.route('/:id/task')
     .post(auth, decodeLoggedUser, taskController.post);
