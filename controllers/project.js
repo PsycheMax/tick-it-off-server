@@ -17,8 +17,6 @@ function canLoggedUserReadThis(project, loggedUser) {
     }
 }
 function canLoggedUserManageThis(project, loggedUser) {
-    console.log(project);
-    console.log(loggedUser);
     const managersArray = project.users["managers"];
     for (let i = 0; i < managersArray.length; i++) {
         const userInArray = managersArray[i];
@@ -50,7 +48,6 @@ projectController.getRoot = async function (req, res) {
 
 projectController.getID = async function (req, res) {
     const { id } = req.params;
-    console.log(id);
     try {
         let toReturn = await Projects.findById(id);
         console.log(toReturn);

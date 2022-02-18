@@ -28,6 +28,6 @@ router.route('/:id/task/:taskid')
 
 router.route('/:id/task/:taskid/settings')
     .get(auth, decodeLoggedUser, taskController.getTaskSettings)
-    .patch(auth, decodeLoggedUser, taskController.setTaskSettings);
+    .post(auth, decodeLoggedUser, taskController.setTaskSettings);
 
 module.exports = router;

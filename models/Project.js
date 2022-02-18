@@ -62,7 +62,6 @@ const ProjectSchema = new Schema({
 
 // The following middleware cycles through the users in the Project ".users" property, and adds this project to the correct user
 ProjectSchema.pre('save', async function () {
-
     // The following for...in goes through the keys of the document.user object ("managers", "joiners", "creators")
     for (const key in this.users) {
         if (Object.hasOwnProperty.call(this.users, key)) {
@@ -82,31 +81,6 @@ ProjectSchema.pre('save', async function () {
             }
         }
     }
-
-    // for (let i = 0; i < this.users.creators.length; i++) {
-    //     const userInArray = this.users.creators[i];
-    //     const userFound = await Users.findById(userInArray);
-    //     if (userFound.projects.created.indexOf(this._id) === -1) {
-    //         userFound.projects.created = [...userFound.projects.created, this._id];
-    //         await userFound.save();
-    //     }
-    // }
-    // for (let i = 0; i < this.users.joiners.length; i++) {
-    //     const userInArray = this.users.joiners[i];
-    //     const userFound = await Users.findById(userInArray);
-    //     if (userFound.projects.joined.indexOf(this._id) === -1) {
-    //         userFound.projects.joined = [...userFound.projects.joined, this._id];
-    //         await userFound.save();
-    //     }
-    // }
-    // for (let i = 0; i < this.users.managers.length; i++) {
-    //     const userInArray = this.users.managers[i];
-    //     const userFound = await Users.findById(userInArray);
-    //     if (userFound.projects.managed.indexOf(this._id) === -1) {
-    //         userFound.projects.managed = [...userFound.projects.managed, this._id];
-    //         await userFound.save();
-    //     }
-    // }
     this.modificationDate = Date.now();
 });
 
