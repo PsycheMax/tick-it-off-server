@@ -86,7 +86,8 @@ userController.postNewUser = async function (req, res) {
 
 userController.login = async function (req, res) {
     try {
-        const { email, password } = req.body.loginUser;
+        let { email, password } = req.body.loginUser;
+        email = email.toLowerCase();
         if (!(email && password)) {
             res.status(400).send("Please fill all the input fields");
         }
@@ -102,7 +103,7 @@ userController.login = async function (req, res) {
             userToLogin.token = token;
             res.status(200).json(userToLogin);
         } else {
-            res.status(400).send("Invalid Credentials");
+            res.status(401).send("Invalid Credentials");
         }
     } catch (error) {
         console.log(error);

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const salt = 10;
 
 module.exports.encrypt = async function (stringToEncrypt) {
-    let toReturn = await bcrypt.hash(stringToEncrypt, 10);
+    let toReturn = await bcrypt.hash(stringToEncrypt, salt);
     return toReturn;
 }
 

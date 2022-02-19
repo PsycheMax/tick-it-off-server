@@ -6,7 +6,9 @@ const app = express();
 const port = process.env.EXPRESS_PORT || 2001;
 
 const cors = require('cors');
-app.use(cors());
+app.use(cors({
+    origin: "*"
+}));
 
 // The following is basically body-parser - it allows me to parse the req.body object as a JSON object in the controller methods.
 app.use(express.urlencoded({ extended: true }));
