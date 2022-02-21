@@ -77,7 +77,10 @@ userController.postNewUser = async function (req, res) {
             expiresIn: '1h'
         });
         newUser.token = token;
-        res.status(201).json(newUser);
+        let toReturn = JSON.parse(newUser);
+        toReturn.password = "";
+        console.log(toReturn);
+        res.status(201).json(toReturn);
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
@@ -101,7 +104,10 @@ userController.login = async function (req, res) {
                 expiresIn: '1h'
             });
             userToLogin.token = token;
-            res.status(200).json(userToLogin);
+            let toReturn = userToLogin;
+            toReturn.password = "HIDDEN";
+            console.log(toReturn);
+            res.status(200).json(toReturn);
         } else {
             res.status(401).send("Invalid Credentials");
         }
