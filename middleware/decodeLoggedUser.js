@@ -10,6 +10,7 @@ module.exports = async function (req, res, next) {
         console.log(decoded);
         let loggedUser = await Users.findOne({ _id: decoded.payload.user_id });
         req.loggedUser = loggedUser;
+        console.log("Out of decoding middleware");
         next();
     } else {
         console.log("No user logged");

@@ -26,7 +26,7 @@ const UserSchema = new Schema({
     status: {
         type: String
     },
-    lastLogin: {
+    lastOnline: {
         type: Date,
         default: Date.now
     },

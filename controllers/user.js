@@ -39,18 +39,21 @@ userController.getID = async function (req, res) {
 }
 
 userController.postNewUser = async function (req, res) {
+    console.log(req.body.newUser);
     // The next declaration saves a lot of time retyping stuff when changing the way data is submitted to the API
     let reqUser = req.body.newUser;
+    reqUser.email = reqUser.email.toLowerCase();
+    console.log(reqUser);
     try {
         const existingUser = await Users.findOne({ email: reqUser.email });
-        // if (existingUser) {
-        //     return res.status(409).send("This email cannot be used.");
-        // }
+        if (existingUser) {
+            return res.status(409).send("This email address cannot be used.");
+        }
         let encryptedPassword = await encrypt(reqUser.password);
         let newUser = new Users({
             username: reqUser.username,
             password: encryptedPassword,
-            email: reqUser.email.toLowerCase(),
+            email: reqUser.email,
             image: reqUser.image,
             status: "Active",
             creationDate: Date.now(),
@@ -77,9 +80,9 @@ userController.postNewUser = async function (req, res) {
             expiresIn: '1h'
         });
         newUser.token = token;
-        let toReturn = JSON.parse(newUser);
+        let toReturn = newUser;
         toReturn.password = "";
-        console.log(toReturn);
+        console.log("New User created: " + newUser.username);
         res.status(201).json(toReturn);
     } catch (error) {
         console.log(error);
@@ -96,17 +99,16 @@ userController.login = async function (req, res) {
         }
         const userToLogin = await Users.findOne({ email: email });
         if (userToLogin && (await compare(password, userToLogin.password))) {
-            userToLogin.lastLogin = Date.now();
+            userToLogin.lastOnline = Date.now();
             await userToLogin.save();
             const token = jwt.sign({
                 user_id: userToLogin._id, email: email
             }, process.env.TOKEN_KEY, {
-                expiresIn: '1h'
+                expiresIn: '1500h'
             });
             userToLogin.token = token;
             let toReturn = userToLogin;
             toReturn.password = "HIDDEN";
-            console.log(toReturn);
             res.status(200).json(toReturn);
         } else {
             res.status(401).send("Invalid Credentials");
@@ -124,8 +126,11 @@ userController.logout = async function (req, res) {
             }, process.env.TOKEN_KEY, {
                 expiresIn: "10"
             })
-            loggedUser.token = logoutToken;
-            res.status(200).json(logoutToken);
+            let logoutUser = req.loggedUser
+            logoutUser.lastOnline = Date.now();
+            logoutUser.token = logoutToken;
+            await logoutUser.save();
+            res.status(200).send("Logout Successful");
         } else {
             res.status(200).send("Already logged out");
         }
@@ -139,7 +144,8 @@ userController.patch = async function (req, res) {
     const { id } = req.params;
     const { patchedUser } = req.body;
     patchedUser.modificationDate = Date.now();
-    patchedUser.password = await encrypt(patchedUser.password);
+    patchedUser.password ? patchedUser.password = await encrypt(patchedUser.password) : "";
+    patchedUser.email ? patchedUser.email = patchedUser.email.toLowerCase() : "";
     try {
         const toUpdate = await Users.findById(id);
         if (req.loggedUser._id.toString() === toUpdate._id.toString()) {
