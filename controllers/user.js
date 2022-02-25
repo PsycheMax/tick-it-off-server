@@ -144,22 +144,34 @@ userController.patch = async function (req, res) {
     const { id } = req.params;
     const { patchedUser } = req.body;
     patchedUser.modificationDate = Date.now();
-    patchedUser.password ? patchedUser.password = await encrypt(patchedUser.password) : "";
+
     patchedUser.email ? patchedUser.email = patchedUser.email.toLowerCase() : "";
     try {
         const toUpdate = await Users.findById(id);
-        if (req.loggedUser._id.toString() === toUpdate._id.toString()) {
-            // The following for...in iterates through the PATCHEDJsonObject received by the request, and updates the DB Document with the eventual new data
-            for (const key in patchedUser) {
-                if (Object.hasOwnProperty.call(patchedUser, key)) {
-                    toUpdate[key] = patchedUser[key];
+        patchedUser.password ? patchedUser.password = await encrypt(patchedUser.password) : patchedUser.password = toUpdate.password;
+        if (toUpdate) {
+            let passwordCompare = await compare(patchedUser.oldPassword, toUpdate.password);
+            if (passwordCompare) {
+                if (req.loggedUser._id.toString() === toUpdate._id.toString()) {
+                    // The following for...in iterates through the PATCHEDJsonObject received by the request, and updates the DB Document with the eventual new data
+                    for (const key in patchedUser) {
+                        if (Object.hasOwnProperty.call(patchedUser, key)) {
+                            toUpdate[key] = patchedUser[key];
+                        }
+                    }
+                    await toUpdate.save();
+                    res.status(200).send(toUpdate);
+                } else {
+                    res.status(403).send("You lack the authorization to perform this operation");
                 }
+            } else {
+                res.status(401).send("Please enter the correct current password");
             }
-            await toUpdate.save();
-            res.send(toUpdate);
-        } else {
-            res.status(403).send("You lack the authorization to perform this operation");
         }
+        else {
+            res.status(404).send("Could not find the user, please refresh the page.");
+        }
+
     } catch (error) {
         console.log(req.body);
         console.log(error);
