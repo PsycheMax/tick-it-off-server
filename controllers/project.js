@@ -49,7 +49,11 @@ projectController.getRoot = async function (req, res) {
 projectController.getID = async function (req, res) {
     const { id } = req.params;
     try {
-        let toReturn = await Projects.findById(id);
+        let toReturn = await Projects.findById(id)
+            .populate("tasks", "status image completed name")
+            .populate("users.creators", "username image status")
+            .populate("users.joiners", "username image status")
+            .populate("users.managers", "username image status");
         console.log(toReturn);
         if (toReturn) {
             if (canLoggedUserReadThis(toReturn, req.loggedUser)) {
@@ -88,7 +92,7 @@ projectController.post = async function (req, res) {
             notifications: []
         });
         await newProject.save();
-        res.status(200).send("This is the project ID " + newProject._id);
+        res.status(200).send(newProject._id);
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
@@ -99,7 +103,11 @@ projectController.patch = async function (req, res) {
     const { id } = req.params;
     const { patchedProject } = req.body;
     try {
-        const toUpdate = await Projects.findById(id);
+        const toUpdate = await Projects.findById(id)
+            .populate("tasks", "status image completed name")
+            .populate("users.creators", "username image status")
+            .populate("users.joiners", "username image status")
+            .populate("users.managers", "username image status");
         if (toUpdate) {
             if (canLoggedUserManageThis(toUpdate, req.loggedUser)) {
                 // The following for...in iterates through the PATCHEDJsonObject received by the request, and updates the DB Document with the eventual new data

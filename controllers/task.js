@@ -45,7 +45,11 @@ taskController.getRoot = async function (req, res) {
 taskController.getID = async function (req, res) {
     const { id: projectID, taskid: taskID } = req.params;
     try {
-        let toReturn = await Tasks.findById(taskID);
+        let toReturn = await Tasks.findById(taskID)
+            .populate("project", "name image status")
+            .populate("users.creators", "username image status")
+            .populate("users.joiners", "username image status")
+            .populate("users.managers", "username image status");
         console.log(toReturn);
         if (toReturn) {
             if (canLoggedUserReadThis(toReturn, req.loggedUser)) {
@@ -106,8 +110,12 @@ taskController.patch = async function (req, res) {
     const { id: projectID, taskid: taskID } = req.params;
     const { patchedTask } = req.body;
     try {
-        const toUpdate = await Tasks.findById(taskID);
-        const projectBelongingTo = await Projects.findById(projectID);
+        const toUpdate = await Tasks.findById(taskID)
+            .populate("project", "name image status")
+            .populate("users.creators", "username image status")
+            .populate("users.joiners", "username image status")
+            .populate("users.managers", "username image status");
+        const projectBelongingTo = toUpdate.project;
         if (toUpdate) {
             if (projectBelongingTo) {
                 if (canLoggedUserManageThis(toUpdate, req.loggedUser) && canLoggedUserManageThis(projectBelongingTo, req.loggedUser)) {

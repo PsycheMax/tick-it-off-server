@@ -25,7 +25,10 @@ userController.getID = async function (req, res) {
     const { id } = req.params;
     console.log(id);
     try {
-        let toReturn = await Users.findById(id);
+        let toReturn = await Users.findById(id)
+            .populate('projects.created', 'name status image')
+            .populate('projects.managed', 'name status image')
+            .populate('projects.joined', 'name status image');
         console.log(toReturn);
         if (toReturn) {
             res.send(toReturn);
@@ -97,7 +100,10 @@ userController.login = async function (req, res) {
         if (!(email && password)) {
             res.status(400).send("Please fill all the input fields");
         }
-        const userToLogin = await Users.findOne({ email: email });
+        const userToLogin = await Users.findOne({ email: email })
+            .populate('projects.created', 'name status image')
+            .populate('projects.managed', 'name status image')
+            .populate('projects.joined', 'name status image');
         if (userToLogin && (await compare(password, userToLogin.password))) {
             userToLogin.lastOnline = Date.now();
             await userToLogin.save();
@@ -147,7 +153,10 @@ userController.patch = async function (req, res) {
 
     patchedUser.email ? patchedUser.email = patchedUser.email.toLowerCase() : "";
     try {
-        const toUpdate = await Users.findById(id);
+        const toUpdate = await Users.findById(id)
+            .populate('projects.created', 'name status image')
+            .populate('projects.managed', 'name status image')
+            .populate('projects.joined', 'name status image');
         patchedUser.password ? patchedUser.password = await encrypt(patchedUser.password) : patchedUser.password = toUpdate.password;
         if (toUpdate) {
             let passwordCompare = await compare(patchedUser.oldPassword, toUpdate.password);
