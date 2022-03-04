@@ -92,7 +92,7 @@ projectController.post = async function (req, res) {
             notifications: []
         });
         await newProject.save();
-        res.status(200).send(newProject._id);
+        res.status(201).send(newProject);
     } catch (error) {
         console.log(error);
         res.status(500).send(error);

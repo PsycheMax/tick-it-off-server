@@ -93,7 +93,7 @@ taskController.post = async function (req, res) {
                     notifications: []
                 });
                 await newTask.save();
-                res.status(200).send("This is the Task ID " + newTask._id + "\n \r The project ID is " + foundProject._id);
+                res.status(201).send(newTask);
             } else {
                 res.status(403).send("You lack the authorization to perform this operation");
             }
