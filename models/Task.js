@@ -22,9 +22,9 @@ const TaskSchema = new Schema({
     level: {
         type: Number
     },
-    status: {
-        type: String,
-        default: "Active"
+    active: {
+        type: Boolean,
+        default: true
     },
     creationDate: {
         type: Date,
@@ -93,12 +93,28 @@ TaskSchema.pre('save', async function () {
     try {
         const projectBelongingTo = await Projects.findById(this.project);
         if (projectBelongingTo) {
-            if (projectBelongingTo.tasks) {
-                if (projectBelongingTo.tasks.indexOf(this._id) === -1) {
-                    projectBelongingTo.tasks = [...projectBelongingTo.tasks, this._id];
+            if (this.active) {
+                if (projectBelongingTo.tasks) {
+                    if (projectBelongingTo.tasks.indexOf(this._id) === -1) {
+                        projectBelongingTo.tasks = [...projectBelongingTo.tasks, this._id];
+                    }
+                } else {
+                    projectBelongingTo.tasks = [this._id];
+                }
+                if (projectBelongingTo.archivedTasks.indexOf(this._id) !== -1) {
+                    projectBelongingTo.archivedTasks.splice(projectBelongingTo.archivedTasks.indexOf(this._id), 1);
                 }
             } else {
-                projectBelongingTo.tasks = [this._id];
+                if (projectBelongingTo.archivedTasks) {
+                    if (projectBelongingTo.archivedTasks.indexOf(this._id) === -1) {
+                        projectBelongingTo.archivedTasks = [...projectBelongingTo.archivedTasks, this._id];
+                    } else {
+                        projectBelongingTo.archivedTasks = [this._id];
+                    }
+                }
+                if (projectBelongingTo.tasks.indexOf(this._id) !== -1) {
+                    projectBelongingTo.tasks.splice(projectBelongingTo.tasks.indexOf(this._id), 1);
+                }
             }
             await projectBelongingTo.save();
         } else {

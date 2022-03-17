@@ -80,7 +80,7 @@ taskController.post = async function (req, res) {
                     description: reqTask.description,
                     image: reqTask.image,
                     level: reqTask.level,
-                    status: "Active",
+                    active: true,
                     creationDate: Date.now(),
                     modificationDate: Date.now(),
                     project: foundProject._id,
@@ -115,7 +115,7 @@ taskController.patch = async function (req, res) {
             .populate("users.creators", "username image status")
             .populate("users.joiners", "username image status")
             .populate("users.managers", "username image status");
-        const projectBelongingTo = toUpdate.project;
+        const projectBelongingTo = await Projects.findById(projectID);
         if (toUpdate) {
             if (projectBelongingTo) {
                 if (canLoggedUserManageThis(toUpdate, req.loggedUser) && canLoggedUserManageThis(projectBelongingTo, req.loggedUser)) {
@@ -151,9 +151,9 @@ taskController.delete = async function (req, res) {
         if (toDelete) {
             if (projectBelongingTo) {
                 if (canLoggedUserManageThis(toDelete, req.loggedUser) && canLoggedUserManageThis(projectBelongingTo, req.loggedUser)) {
-                    toDelete.status = "Inactive";
+                    toDelete.active = false;
                     await toDelete.save();
-                    res.status(200).send("Task " + taskID + "has been deactivated");
+                    res.status(200).send("Task " + taskID + "has been moved to the archived tasks");
                 } else {
                     res.status(403).send("You lack the authorization to perform this operation");
                 }
