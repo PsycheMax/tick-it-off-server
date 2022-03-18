@@ -31,10 +31,8 @@ let taskController = {};
 
 taskController.getRoot = async function (req, res) {
     let toReturn = "Get Task Page";
-    console.log(toReturn);
     try {
         let toReturn = await Tasks.find({});
-        console.log(toReturn);
         res.status(200).send(toReturn);
     } catch (error) {
         console.log(error);
@@ -46,11 +44,10 @@ taskController.getID = async function (req, res) {
     const { id: projectID, taskid: taskID } = req.params;
     try {
         let toReturn = await Tasks.findById(taskID)
-            .populate("project", "name image status")
-            .populate("users.creators", "username image status")
-            .populate("users.joiners", "username image status")
-            .populate("users.managers", "username image status");
-        console.log(toReturn);
+            .populate("project", "name image active")
+            .populate("users.creators", "username image active")
+            .populate("users.joiners", "username image active")
+            .populate("users.managers", "username image active");
         if (toReturn) {
             if (canLoggedUserReadThis(toReturn, req.loggedUser)) {
                 res.status(200).send(toReturn);
@@ -111,10 +108,10 @@ taskController.patch = async function (req, res) {
     const { patchedTask } = req.body;
     try {
         const toUpdate = await Tasks.findById(taskID)
-            .populate("project", "name image status")
-            .populate("users.creators", "username image status")
-            .populate("users.joiners", "username image status")
-            .populate("users.managers", "username image status");
+            .populate("project", "name image active")
+            .populate("users.creators", "username image active")
+            .populate("users.joiners", "username image active")
+            .populate("users.managers", "username image active");
         const projectBelongingTo = await Projects.findById(projectID);
         if (toUpdate) {
             if (projectBelongingTo) {

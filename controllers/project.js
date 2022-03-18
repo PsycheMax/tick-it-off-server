@@ -31,10 +31,8 @@ let projectController = {};
 
 projectController.getRoot = async function (req, res) {
     let toReturn = "Get Project Page";
-    console.log(toReturn);
     try {
         let toReturn = await Projects.find({});
-        console.log(toReturn);
         if (toReturn) {
             res.status(200).send(toReturn);
         } else {
@@ -52,10 +50,9 @@ projectController.getID = async function (req, res) {
         let toReturn = await Projects.findById(id)
             .populate("tasks", "active image completion name")
             .populate("archivedTasks", "active image completion name")
-            .populate("users.creators", "username image status")
-            .populate("users.joiners", "username image status")
-            .populate("users.managers", "username image status");
-        console.log(toReturn);
+            .populate("users.creators", "username image active")
+            .populate("users.joiners", "username image active")
+            .populate("users.managers", "username image active");
         if (toReturn) {
             if (canLoggedUserReadThis(toReturn, req.loggedUser)) {
                 res.status(200).send(toReturn);
@@ -80,7 +77,7 @@ projectController.post = async function (req, res) {
             description: reqProject.description,
             completion: false,
             image: reqProject.image,
-            status: "Active",
+            active: true,
             creationDate: Date.now(),
             modificationDate: Date.now(),
             users: {
@@ -107,9 +104,9 @@ projectController.patch = async function (req, res) {
         const toUpdate = await Projects.findById(id)
             .populate("tasks", "active image completed name")
             .populate("archivedTasks", "active image completion name")
-            .populate("users.creators", "username image status")
-            .populate("users.joiners", "username image status")
-            .populate("users.managers", "username image status");
+            .populate("users.creators", "username image active")
+            .populate("users.joiners", "username image active")
+            .populate("users.managers", "username image active");
         if (toUpdate) {
             if (canLoggedUserManageThis(toUpdate, req.loggedUser)) {
                 // The following for...in iterates through the PATCHEDJsonObject received by the request, and updates the DB Document with the eventual new data
@@ -140,15 +137,19 @@ projectController.delete = async function (req, res) {
 
     try {
         const toDelete = await Projects.findById(id);
-        // if (toDelete._id === req.session.userID){ }
+
         if (toDelete) {
-            if (canLoggedUserManageThis(toDelete, req.loggedUser)) {
-                toDelete.status = "Inactive";
-                toDelete.modificationDate = Date.now();
-                await toDelete.save();
-                res.status(200).send("Project " + id + "has been deactivated");
+            if (toDelete.active) {
+                if (canLoggedUserManageThis(toDelete, req.loggedUser)) {
+                    toDelete.active = false;
+                    toDelete.modificationDate = Date.now();
+                    await toDelete.save();
+                    res.status(200).send(`Project ${id}, ${toDelete.name} has been deactivated.`);
+                } else {
+                    res.status(403).send("You lack the authorization to perform this operation");
+                }
             } else {
-                res.status(403).send("You lack the authorization to perform this operation");
+                res.status(204).send(`Project ${id}, ${toDelete.name} was already deactivated.`)
             }
         } else {
             res.send("Project not found");

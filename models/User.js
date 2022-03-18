@@ -23,8 +23,9 @@ const UserSchema = new Schema({
         // URL
         type: String
     },
-    status: {
-        type: String
+    active: {
+        type: Boolean,
+        default: true
     },
     lastOnline: {
         type: Date,
@@ -51,7 +52,7 @@ const UserSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Projects'
         }],
-        completed: [{
+        archived: [{
             type: Schema.Types.ObjectId,
             ref: 'Projects'
         }]
@@ -69,7 +70,7 @@ const UserSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Tasks'
         }],
-        completed: [{
+        archived: [{
             type: Schema.Types.ObjectId,
             ref: 'Tasks'
         }],

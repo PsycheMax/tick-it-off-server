@@ -2,7 +2,6 @@ const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
 const Users = require("../models/User");
 
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { encrypt, compare } = require("../utils/passwordLogic");
 
@@ -10,10 +9,8 @@ let userController = {};
 
 userController.getRoot = async function (req, res) {
     let toReturn = "Get User Page";
-    console.log(toReturn);
     try {
         let toReturn = await Users.find({});
-        console.log(toReturn);
         res.send(toReturn);
     } catch (error) {
         console.log(error);
@@ -23,13 +20,12 @@ userController.getRoot = async function (req, res) {
 
 userController.getID = async function (req, res) {
     const { id } = req.params;
-    console.log(id);
     try {
         let toReturn = await Users.findById(id)
-            .populate('projects.created', 'name status image')
-            .populate('projects.managed', 'name status image')
-            .populate('projects.joined', 'name status image');
-        console.log(toReturn);
+            .populate('projects.created', 'name active image')
+            .populate('projects.managed', 'name active image')
+            .populate('projects.joined', 'name active image')
+            .populate('projects.archived', 'name active image');
         if (toReturn) {
             res.send(toReturn);
         } else {
@@ -42,11 +38,9 @@ userController.getID = async function (req, res) {
 }
 
 userController.postNewUser = async function (req, res) {
-    console.log(req.body.newUser);
     // The next declaration saves a lot of time retyping stuff when changing the way data is submitted to the API
     let reqUser = req.body.newUser;
     reqUser.email = reqUser.email.toLowerCase();
-    console.log(reqUser);
     try {
         const existingUser = await Users.findOne({ email: reqUser.email });
         if (existingUser) {
@@ -58,20 +52,20 @@ userController.postNewUser = async function (req, res) {
             password: encryptedPassword,
             email: reqUser.email,
             image: reqUser.image,
-            status: "Active",
+            active: true,
             creationDate: Date.now(),
             modificationDate: Date.now(),
             projects: {
                 created: [],
                 joined: [],
                 managed: [],
-                completed: []
+                archived: []
             },
             tasks: {
                 created: [],
                 assigned: [],
                 managed: [],
-                completed: []
+                archived: []
             },
             settings: {},
             notifications: []
@@ -85,7 +79,6 @@ userController.postNewUser = async function (req, res) {
         newUser.token = token;
         let toReturn = newUser;
         toReturn.password = "";
-        console.log("New User created: " + newUser.username);
         res.status(201).json(toReturn);
     } catch (error) {
         console.log(error);
@@ -101,16 +94,17 @@ userController.login = async function (req, res) {
             res.status(400).send("Please fill all the input fields");
         }
         const userToLogin = await Users.findOne({ email: email })
-            .populate('projects.created', 'name status image')
-            .populate('projects.managed', 'name status image')
-            .populate('projects.joined', 'name status image');
+            .populate('projects.created', 'name active image')
+            .populate('projects.managed', 'name active image')
+            .populate('projects.joined', 'name active image')
+            .populate('projects.archived', 'name active image');
         if (userToLogin && (await compare(password, userToLogin.password))) {
             userToLogin.lastOnline = Date.now();
             await userToLogin.save();
             const token = jwt.sign({
                 user_id: userToLogin._id, email: email
             }, process.env.TOKEN_KEY, {
-                expiresIn: '1500h'
+                expiresIn: '15000h'
             });
             userToLogin.token = token;
             let toReturn = userToLogin;
@@ -132,7 +126,7 @@ userController.logout = async function (req, res) {
             }, process.env.TOKEN_KEY, {
                 expiresIn: "10"
             })
-            let logoutUser = req.loggedUser
+            let logoutUser = req.loggedUser;
             logoutUser.lastOnline = Date.now();
             logoutUser.token = logoutToken;
             await logoutUser.save();
@@ -154,9 +148,10 @@ userController.patch = async function (req, res) {
     patchedUser.email ? patchedUser.email = patchedUser.email.toLowerCase() : "";
     try {
         const toUpdate = await Users.findById(id)
-            .populate('projects.created', 'name status image')
-            .populate('projects.managed', 'name status image')
-            .populate('projects.joined', 'name status image');
+            .populate('projects.created', 'name active image')
+            .populate('projects.managed', 'name active image')
+            .populate('projects.joined', 'name active image')
+            .populate('projects.archived', 'name active image');
         patchedUser.password ? patchedUser.password = await encrypt(patchedUser.password) : patchedUser.password = toUpdate.password;
         if (toUpdate) {
             let passwordCompare = await compare(patchedUser.oldPassword, toUpdate.password);
