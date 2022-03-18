@@ -48,8 +48,8 @@ projectController.getID = async function (req, res) {
     const { id } = req.params;
     try {
         let toReturn = await Projects.findById(id)
-            .populate("tasks", "active image completion name")
-            .populate("archivedTasks", "active image completion name")
+            .populate("tasks", "active image completion name description")
+            .populate("archivedTasks", "active image completion name description")
             .populate("users.creators", "username image active")
             .populate("users.joiners", "username image active")
             .populate("users.managers", "username image active");
@@ -102,8 +102,8 @@ projectController.patch = async function (req, res) {
     const { patchedProject } = req.body;
     try {
         const toUpdate = await Projects.findById(id)
-            .populate("tasks", "active image completed name")
-            .populate("archivedTasks", "active image completion name")
+            .populate("tasks", "active image completed name description")
+            .populate("archivedTasks", "active image completion name description")
             .populate("users.creators", "username image active")
             .populate("users.joiners", "username image active")
             .populate("users.managers", "username image active");
