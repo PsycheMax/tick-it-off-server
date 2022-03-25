@@ -22,10 +22,10 @@ userController.getID = async function (req, res) {
     const { id } = req.params;
     try {
         let toReturn = await Users.findById(id)
-            .populate('projects.created', 'name active image')
-            .populate('projects.managed', 'name active image')
-            .populate('projects.joined', 'name active image')
-            .populate('projects.archived', 'name active image');
+            .populate('projects.created', 'name active image description')
+            .populate('projects.managed', 'name active image description')
+            .populate('projects.joined', 'name active image description')
+            .populate('projects.archived', 'name active image description');
         if (toReturn) {
             res.send(toReturn);
         } else {
@@ -94,10 +94,10 @@ userController.login = async function (req, res) {
             res.status(400).send("Please fill all the input fields");
         }
         const userToLogin = await Users.findOne({ email: email })
-            .populate('projects.created', 'name active image')
-            .populate('projects.managed', 'name active image')
-            .populate('projects.joined', 'name active image')
-            .populate('projects.archived', 'name active image');
+            .populate('projects.created', 'name active image description')
+            .populate('projects.managed', 'name active image description')
+            .populate('projects.joined', 'name active image description')
+            .populate('projects.archived', 'name active image description');
         if (userToLogin && (await compare(password, userToLogin.password))) {
             userToLogin.lastOnline = Date.now();
             await userToLogin.save();
