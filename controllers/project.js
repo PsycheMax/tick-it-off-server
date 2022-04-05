@@ -48,7 +48,7 @@ projectController.getID = async function (req, res) {
     const { id } = req.params;
     try {
         let toReturn = await Projects.findById(id)
-            .populate("tasks", "active image completion name description")
+            .populate("tasks", "active image completion name description creationDate modificationDate")
             .populate("archivedTasks", "active image completion name description")
             .populate("users.creators", "username image active")
             .populate("users.joiners", "username image active")
