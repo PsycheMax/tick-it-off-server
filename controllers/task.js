@@ -140,7 +140,7 @@ taskController.patch = async function (req, res) {
     }
 }
 
-taskController.delete = async function (req, res) {
+taskController.deactivate = async function (req, res) {
     const { id: projectID, taskid: taskID } = req.params;
     try {
         const toDelete = await Tasks.findById(taskID);
@@ -150,7 +150,32 @@ taskController.delete = async function (req, res) {
                 if (canLoggedUserManageThis(toDelete, req.loggedUser) && canLoggedUserManageThis(projectBelongingTo, req.loggedUser)) {
                     toDelete.active = false;
                     await toDelete.save();
-                    res.status(200).send("Task " + taskID + "has been moved to the archived tasks");
+                    res.status(200).send("Task " + taskID + " has been moved to the archived tasks");
+                } else {
+                    res.status(403).send("You lack the authorization to perform this operation");
+                }
+            } else {
+                res.status(404).send("The project you're referring to can't be found");
+            }
+        } else {
+            res.status(404).send("The task you're referring to can't be found");
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+taskController.permanentlyDelete = async function (req, res) {
+    const { id: projectID, taskid: taskID } = req.params;
+    try {
+        const toDelete = await Tasks.findById(taskID);
+        const projectBelongingTo = await Projects.findById(projectID);
+        if (toDelete) {
+            if (projectBelongingTo) {
+                if (canLoggedUserManageThis(toDelete, req.loggedUser) && canLoggedUserManageThis(projectBelongingTo, req.loggedUser)) {
+                    await Tasks.deleteOne(toDelete);
+                    res.status(200).send("Task " + taskID + " has been deleted in a permanent way");
                 } else {
                     res.status(403).send("You lack the authorization to perform this operation");
                 }

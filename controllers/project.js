@@ -130,7 +130,7 @@ projectController.patch = async function (req, res) {
     }
 }
 
-projectController.delete = async function (req, res) {
+projectController.deactivate = async function (req, res) {
     const { id } = req.params;
 
     // MOST PROBABLY in the long-run it's safer to just change the status of the entry, instead of deleting it, but I'll keep this around just in case
@@ -150,6 +150,30 @@ projectController.delete = async function (req, res) {
                 }
             } else {
                 res.status(204).send(`Project ${id}, ${toDelete.name} was already deactivated.`)
+            }
+        } else {
+            res.send("Project not found");
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+
+projectController.permanentlyDelete = async function (req, res) {
+    const { id } = req.params;
+
+    // MOST PROBABLY in the long-run it's safer to just change the status of the entry, instead of deleting it, but I'll keep this around just in case
+
+    try {
+        const toDelete = await Projects.findById(id);
+
+        if (toDelete) {
+            if (canLoggedUserManageThis(toDelete, req.loggedUser)) {
+                let toReturn = await Projects.deleteOne(toDelete);
+                res.status(200).send(`Project ${id}, ${toReturn.name} has been deactivated.`);
+            } else {
+                res.status(403).send("You lack the authorization to perform this operation");
             }
         } else {
             res.send("Project not found");

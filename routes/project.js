@@ -12,7 +12,10 @@ router.route('/')
 router.route('/:id')
     .get(auth, decodeLoggedUser, projectController.getID)
     .patch(auth, decodeLoggedUser, projectController.patch)
-    .delete(auth, decodeLoggedUser, projectController.delete);
+    .delete(auth, decodeLoggedUser, projectController.deactivate);
+
+router.route('/permanentDelete/:id')
+    .delete(auth, decodeLoggedUser, projectController.permanentlyDelete);
 
 router.route('/:id/settings')
     .get(auth, decodeLoggedUser, projectController.getProjectSettings)
@@ -24,7 +27,10 @@ router.route('/:id/task')
 router.route('/:id/task/:taskid')
     .get(auth, decodeLoggedUser, taskController.getID)
     .patch(auth, decodeLoggedUser, taskController.patch)
-    .delete(auth, decodeLoggedUser, taskController.delete);
+    .delete(auth, decodeLoggedUser, taskController.deactivate);
+
+router.route('/:id/task/permanentlyDelete/:taskid')
+    .delete(auth, decodeLoggedUser, taskController.permanentlyDelete);
 
 router.route('/:id/task/:taskid/settings')
     .get(auth, decodeLoggedUser, taskController.getTaskSettings)
