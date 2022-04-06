@@ -14,7 +14,7 @@ router.route('/:id')
     .patch(auth, decodeLoggedUser, projectController.patch)
     .delete(auth, decodeLoggedUser, projectController.deactivate);
 
-router.route('/permanentDelete/:id')
+router.route('/permanentlyDelete/:id')
     .delete(auth, decodeLoggedUser, projectController.permanentlyDelete);
 
 router.route('/:id/settings')

@@ -171,7 +171,7 @@ projectController.permanentlyDelete = async function (req, res) {
         if (toDelete) {
             if (canLoggedUserManageThis(toDelete, req.loggedUser)) {
                 let toReturn = await Projects.deleteOne(toDelete);
-                res.status(200).send(`Project ${id}, ${toReturn.name} has been deactivated.`);
+                res.status(200).send(`Project ${id}, ${toReturn.name} has been deleted permanently.`);
             } else {
                 res.status(403).send("You lack the authorization to perform this operation");
             }
