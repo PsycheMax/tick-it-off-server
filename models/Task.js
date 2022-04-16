@@ -166,7 +166,6 @@ TaskSchema.statics.removeEveryReferenceFromProjects = async function (thisDocume
                 if (task._id.toString() === thisDocument._id.toString()) {
                     let indexInArray = project.tasks.indexOf(thisDocument._id);
                     project.tasks.splice(indexInArray, 1);
-                    console.log("Task pre-remove PROJECTS middleware WORKED ");
                     await project.save();
                 }
             })
@@ -176,7 +175,6 @@ TaskSchema.statics.removeEveryReferenceFromProjects = async function (thisDocume
                 if (task._id.toString() === thisDocument._id.toString()) {
                     let indexInArray = project.archivedTasks.indexOf(thisDocument._id);
                     project.archivedTasks.splice(indexInArray, 1);
-                    console.log("Task pre-remove PROJECTS middleware WORKED ");
                     await project.save();
                 }
             })

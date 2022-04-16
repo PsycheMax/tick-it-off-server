@@ -134,7 +134,6 @@ taskController.patch = async function (req, res) {
             res.status(404).send("The task you're referring to can't be found");
         }
     } catch (error) {
-        console.log(req.body);
         console.log(error);
         res.status(500).send(error);
     }

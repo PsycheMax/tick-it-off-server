@@ -177,7 +177,6 @@ userController.patch = async function (req, res) {
         }
 
     } catch (error) {
-        console.log(req.body);
         console.log(error);
         res.status(500).send(error);
     }
