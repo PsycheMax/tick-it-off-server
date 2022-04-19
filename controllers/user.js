@@ -165,6 +165,7 @@ userController.patch = async function (req, res) {
                             toUpdate[key] = patchedUser[key];
                         }
                     }
+                    toUpdate.modificationDate = formatDateNow();
                     await toUpdate.save();
                     res.status(200).send(toUpdate);
                 } else {

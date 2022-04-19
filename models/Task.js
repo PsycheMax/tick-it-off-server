@@ -30,18 +30,10 @@ const TaskSchema = new Schema({
     creationDate: {
         type: String,
         default: formatDateNow(),
-        dateFormat: {
-            type: Date,
-            default: Date.now
-        }
     },
     modificationDate: {
         type: String,
         default: formatDateNow(),
-        dateFormat: {
-            type: Date,
-            default: Date.now
-        }
     },
     users: {
         creators: [{
@@ -231,6 +223,7 @@ TaskSchema.pre('deleteOne', { query: true }, async function () {
 TaskSchema.pre('save', async function () {
     Projects = require('./Project');
     await TaskSchema.statics.preSaveOperations(Projects, this);
+    this.modificationDate = formatDateNow();
 })
 
 const Tasks = mongoose.model('Tasks', TaskSchema, 'TaskManager_Task');

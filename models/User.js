@@ -30,27 +30,15 @@ const UserSchema = new Schema({
     },
     lastOnline: {
         type: String,
-        default: formatDateNow(),
-        dateFormat: {
-            type: Date,
-            default: Date.now
-        }
+        default: formatDateNow()
     },
     creationDate: {
         type: String,
-        default: formatDateNow(),
-        dateFormat: {
-            type: Date,
-            default: Date.now
-        }
+        default: formatDateNow()
     },
     modificationDate: {
         type: String,
-        default: formatDateNow(),
-        dateFormat: {
-            type: Date,
-            default: Date.now
-        }
+        default: formatDateNow()
     },
     projects: {
         created: [{

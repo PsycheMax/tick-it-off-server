@@ -26,19 +26,11 @@ const ProjectSchema = new Schema({
     },
     creationDate: {
         type: String,
-        default: formatDateNow(),
-        dateFormat: {
-            type: Date,
-            default: Date.now
-        }
+        default: formatDateNow()
     },
     modificationDate: {
         type: String,
-        default: formatDateNow(),
-        dateFormat: {
-            type: Date,
-            default: Date.now
-        }
+        default: formatDateNow()
     },
     users: {
         creators: [{

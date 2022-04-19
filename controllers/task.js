@@ -46,7 +46,7 @@ taskController.getID = async function (req, res) {
     const { id: projectID, taskid: taskID } = req.params;
     try {
         let toReturn = await Tasks.findById(taskID)
-            .populate("project", "name image active")
+            // .populate("project", "name image active")
             .populate("users.creators", "username image active")
             .populate("users.joiners", "username image active")
             .populate("users.managers", "username image active");
