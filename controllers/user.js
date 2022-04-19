@@ -2,6 +2,8 @@ const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
 const Users = require("../models/User");
 
+const formatDateNow = require('../utils/formatDateNow');
+
 const jwt = require('jsonwebtoken');
 const { encrypt, compare } = require("../utils/passwordLogic");
 
@@ -53,8 +55,8 @@ userController.postNewUser = async function (req, res) {
             email: reqUser.email,
             image: reqUser.image,
             active: true,
-            creationDate: Date.now(),
-            modificationDate: Date.now(),
+            creationDate: formatDateNow(),
+            modificationDate: formatDateNow(),
             projects: {
                 created: [],
                 joined: [],
@@ -99,7 +101,7 @@ userController.login = async function (req, res) {
             .populate('projects.joined', 'name active image description')
             .populate('projects.archived', 'name active image description');
         if (userToLogin && (await compare(password, userToLogin.password))) {
-            userToLogin.lastOnline = Date.now();
+            userToLogin.lastOnline = formatDateNow();
             await userToLogin.save();
             const token = jwt.sign({
                 user_id: userToLogin._id, email: email
@@ -127,7 +129,7 @@ userController.logout = async function (req, res) {
                 expiresIn: "10"
             })
             let logoutUser = req.loggedUser;
-            logoutUser.lastOnline = Date.now();
+            logoutUser.lastOnline = formatDateNow();
             logoutUser.token = logoutToken;
             await logoutUser.save();
             res.status(200).send("Logout Successful");
@@ -143,7 +145,7 @@ userController.logout = async function (req, res) {
 userController.patch = async function (req, res) {
     const { id } = req.params;
     const { patchedUser } = req.body;
-    patchedUser.modificationDate = Date.now();
+    patchedUser.modificationDate = formatDateNow();
 
     patchedUser.email ? patchedUser.email = patchedUser.email.toLowerCase() : "";
     try {
@@ -234,6 +236,7 @@ userController.setUserSettings = async function (req, res) {
         if (user) {
             if (req.loggedUser._id.toString() === user._id.toString()) {
                 user.settings = newSettings;
+                user.modificationDate = formatDateNow();
                 user.save();
                 res.send("Settings updated");
             } else {

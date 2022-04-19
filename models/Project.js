@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const formatDateNow = require('../utils/formatDateNow');
 let Tasks = require('./Task');
 let Users = require('./User');
 
@@ -24,12 +25,20 @@ const ProjectSchema = new Schema({
         default: true
     },
     creationDate: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: formatDateNow(),
+        dateFormat: {
+            type: Date,
+            default: Date.now
+        }
     },
     modificationDate: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: formatDateNow(),
+        dateFormat: {
+            type: Date,
+            default: Date.now
+        }
     },
     users: {
         creators: [{
@@ -199,7 +208,7 @@ ProjectSchema.statics.removeEveryReferenceFromUsers = async function (thisDocume
 ProjectSchema.pre('save', async function () {
     // const thisDocument = await this.model.findOne(this.getQuery());
     await ProjectSchema.statics.preSaveOperations(this);
-    this.modificationDate = Date.now();
+    this.modificationDate = formatDateNow();
 });
 
 ProjectSchema.pre('deleteOne', { query: true }, async function () {

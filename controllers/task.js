@@ -2,6 +2,8 @@ const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
 const Users = require("../models/User");
 
+const formatDateNow = require('../utils/formatDateNow');
+
 function canLoggedUserReadThis(task, loggedUser) {
     for (const key in task.users) {
         if (Object.hasOwnProperty.call(task.users, key)) {
@@ -78,8 +80,8 @@ taskController.post = async function (req, res) {
                     image: reqTask.image,
                     level: reqTask.level,
                     active: true,
-                    creationDate: Date.now(),
-                    modificationDate: Date.now(),
+                    creationDate: formatDateNow(),
+                    modificationDate: formatDateNow(),
                     project: foundProject._id,
                     users: {
                         creators: [req.loggedUser._id],
@@ -122,6 +124,7 @@ taskController.patch = async function (req, res) {
                             toUpdate[key] = patchedTask[key];
                         }
                     }
+                    toUpdate.modificationDate = formatDateNow();
                     await toUpdate.save();
                     res.status(200).send(toUpdate);
                 } else {
@@ -142,13 +145,14 @@ taskController.patch = async function (req, res) {
 taskController.deactivate = async function (req, res) {
     const { id: projectID, taskid: taskID } = req.params;
     try {
-        const toDelete = await Tasks.findById(taskID);
+        const toDeactivate = await Tasks.findById(taskID);
         const projectBelongingTo = await Projects.findById(projectID);
-        if (toDelete) {
+        if (toDeactivate) {
             if (projectBelongingTo) {
-                if (canLoggedUserManageThis(toDelete, req.loggedUser) && canLoggedUserManageThis(projectBelongingTo, req.loggedUser)) {
-                    toDelete.active = false;
-                    await toDelete.save();
+                if (canLoggedUserManageThis(toDeactivate, req.loggedUser) && canLoggedUserManageThis(projectBelongingTo, req.loggedUser)) {
+                    toDeactivate.active = false;
+                    toDeactivate.modificationDate = formatDateNow();
+                    await toDeactivate.save();
                     res.status(200).send("Task " + taskID + " has been moved to the archived tasks");
                 } else {
                     res.status(403).send("You lack the authorization to perform this operation");
@@ -225,6 +229,7 @@ taskController.setTaskSettings = async function (req, res) {
             if (projectBelongingTo) {
                 if (canLoggedUserManageThis(task, req.loggedUser) && canLoggedUserManageThis(projectBelongingTo, req.loggedUser)) {
                     task.settings = newSettings;
+                    task.modificationDate = formatDateNow();
                     task.save();
                     res.status(200).send("Settings updated");
                 } else {

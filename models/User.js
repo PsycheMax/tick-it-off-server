@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const formatDateNow = require('../utils/formatDateNow');
 
 // Shortcut to Mongoose.Schema;
 const Schema = mongoose.Schema;
@@ -28,16 +29,28 @@ const UserSchema = new Schema({
         default: true
     },
     lastOnline: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: formatDateNow(),
+        dateFormat: {
+            type: Date,
+            default: Date.now
+        }
     },
     creationDate: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: formatDateNow(),
+        dateFormat: {
+            type: Date,
+            default: Date.now
+        }
     },
     modificationDate: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: formatDateNow(),
+        dateFormat: {
+            type: Date,
+            default: Date.now
+        }
     },
     projects: {
         created: [{

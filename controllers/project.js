@@ -2,6 +2,8 @@ const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
 const Users = require("../models/User");
 
+const formatDateNow = require('../utils/formatDateNow');
+
 function canLoggedUserReadThis(project, loggedUser) {
     for (const key in project.users) {
         if (Object.hasOwnProperty.call(project.users, key)) {
@@ -78,8 +80,8 @@ projectController.post = async function (req, res) {
             completion: false,
             image: reqProject.image,
             active: true,
-            creationDate: Date.now(),
-            modificationDate: Date.now(),
+            creationDate: formatDateNow(),
+            modificationDate: formatDateNow(),
             users: {
                 creators: [req.loggedUser._id],
                 joiners: [],
@@ -115,6 +117,7 @@ projectController.patch = async function (req, res) {
                         toUpdate[key] = patchedProject[key];
                     }
                 }
+                toUpdate.modificationDate = formatDateNow();
                 await toUpdate.save();
                 res.status(200).send(toUpdate);
             } else {
@@ -131,24 +134,21 @@ projectController.patch = async function (req, res) {
 
 projectController.deactivate = async function (req, res) {
     const { id } = req.params;
-
-    // MOST PROBABLY in the long-run it's safer to just change the status of the entry, instead of deleting it, but I'll keep this around just in case
-
     try {
-        const toDelete = await Projects.findById(id);
+        const toDeactivate = await Projects.findById(id);
 
-        if (toDelete) {
-            if (toDelete.active) {
-                if (canLoggedUserManageThis(toDelete, req.loggedUser)) {
-                    toDelete.active = false;
-                    toDelete.modificationDate = Date.now();
-                    await toDelete.save();
-                    res.status(200).send(`Project ${id}, ${toDelete.name} has been deactivated.`);
+        if (toDeactivate) {
+            if (toDeactivate.active) {
+                if (canLoggedUserManageThis(toDeactivate, req.loggedUser)) {
+                    toDeactivate.active = false;
+                    toDeactivate.modificationDate = formatDateNow();
+                    await toDeactivate.save();
+                    res.status(200).send(`Project ${id}, ${toDeactivate.name} has been deactivated.`);
                 } else {
                     res.status(403).send("You lack the authorization to perform this operation");
                 }
             } else {
-                res.status(204).send(`Project ${id}, ${toDelete.name} was already deactivated.`)
+                res.status(204).send(`Project ${id}, ${toDeactivate.name} was already deactivated.`)
             }
         } else {
             res.send("Project not found");
@@ -210,7 +210,7 @@ projectController.setProjectSettings = async function (req, res) {
         if (project) {
             if (canLoggedUserManageThis(project, req.loggedUser)) {
                 project.settings = newSettings;
-                project.modificationDate = Date.now();
+                project.modificationDate = formatDateNow();
                 project.save();
                 res.status(200).send("Settings updated");
             } else {

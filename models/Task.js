@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const formatDateNow = require('../utils/formatDateNow');
 let Projects = require('./Project');
 let Users = require('./User');
 
@@ -27,12 +28,20 @@ const TaskSchema = new Schema({
         default: true
     },
     creationDate: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: formatDateNow(),
+        dateFormat: {
+            type: Date,
+            default: Date.now
+        }
     },
     modificationDate: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: formatDateNow(),
+        dateFormat: {
+            type: Date,
+            default: Date.now
+        }
     },
     users: {
         creators: [{
