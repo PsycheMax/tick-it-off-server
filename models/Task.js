@@ -92,7 +92,7 @@ TaskSchema.statics.preSaveOperations = async function (Projects, thisDocument) {
         console.log(error);
         return "Error 500, can't add the Task to its users";
     }
-    // The following part of the middleware checks the project in task.project and puts this Task in the "tasks.archived" or "tasks.managed" arrays, depending on its own "active" status;
+    // The following part of the middleware checks the project in task.project and puts this Task in its "tasks.archived" or "tasks.managed" arrays, depending on the task own "active" status;
     try {
         const projectBelongingTo = await Projects.findById(thisDocument.project);
         // IF the Project found in this.project exists and it's found
@@ -144,14 +144,96 @@ TaskSchema.statics.preSaveOperations = async function (Projects, thisDocument) {
             }
             await projectBelongingTo.save();
         } else {
-            return "Error 404 - The project can't be found. MongooseMiddlewareTasksSchema";
+            return "MongooseMiddlewareTasksSchema - Error 404 - The Project can't be found.";
         }
     } catch (error) {
         console.log(error);
         return "Error 500, can't add task to its project";
     }
     try {
-        // TODO Put into the archived tasks for the creator user
+        // The following part of the middleware checks the user in task.users.creators[0] and puts this Task in its "tasks.archived" or "tasks.managed" arrays, depending on the task own "active" status;
+        const userBelongingTo = await Users.findById(thisDocument.users.creators[0]);
+        // If thisDocument.users.creators[0] is existing
+        if (userBelongingTo) {
+            // If this document is active
+            if (thisDocument.active) {
+                // If the userBelongingTo.tasks object exists
+                if (userBelongingTo.tasks) {
+                    // If the userBelongingTo.tasks.managed array exists
+                    if (userBelongingTo.tasks.managed) {
+                        // If the found array DOES NOT CONTAIN thisDocument
+                        if (userBelongingTo.tasks.managed.indexOf(thisDocument._id) === -1) {
+                            // Add this document to the array
+                            userBelongingTo.tasks.managed = [...userBelongingTo.tasks.managed, thisDocument._id];
+                        }
+                        // If the userBelongingTo.tasks.managed array does not exist
+                    } else {
+                        // userBelongingTo.tasks.managed will be created as an array containing this document
+                        userBelongingTo.tasks.managed = [thisDocument._id];
+                    }
+                    // If the userBelongingTo.tasks.archived array exists
+                    if (userBelongingTo.tasks.archived) {
+                        // If the archived array DOES contain this document
+                        if (userBelongingTo.tasks.archived.indexOf(thisDocument._id) !== -1) {
+                            // This document will be removed from the userBelongingTo.tasks.archived array
+                            userBelongingTo.tasks.archived.splice(userBelongingTo.tasks.archived.indexOf(thisDocument._id), 1);
+                        }
+                        // if the userBelongingTo.tasks.archived array does not exist
+                    } else {
+                        // userBelongingTo.tasks.archived will be created as an array containing this document
+                        userBelongingTo.tasks.archived = [thisDocument._id]
+                    }
+                    // Is the user does not have a TASKS object, create it and assign thisDocument to the managed and created arrays
+                } else {
+                    userBelongingTo.tasks = {
+                        managed: [thisDocument._id],
+                        archived: [],
+                        created: [thisDocument._id],
+                        assigned: []
+                    }
+                }
+                // if thisDocument is not active
+            } else {
+                // If the userBelongingTo.tasks object exists
+                if (userBelongingTo.tasks) {
+                    // If the userBelongingTo.tasks.archived array exists
+                    if (userBelongingTo.tasks.archived) {
+                        // If the found array DOES NOT CONTAIN thisDocument
+                        if (userBelongingTo.tasks.archived.indexOf(thisDocument._id) === -1) {
+                            // Add this document to the array
+                            userBelongingTo.tasks.archived = [...userBelongingTo.tasks.archived, thisDocument._id];
+                        }
+                        // If the userBelongingTo.tasks.archived array does not exist
+                    } else {
+                        // userBelongingTo.tasks.archived will be created as an array containing this document
+                        userBelongingTo.tasks.archived = [thisDocument];
+                    }
+                    // If the userBelongingTo.tasks.managed array exists
+                    if (userBelongingTo.tasks.managed) {
+                        // If the managed array DOES contain this document
+                        if (userBelongingTo.tasks.managed.indexOf(thisDocument._id) !== -1) {
+                            // This document will be removed from the userBelongingTo.tasks.managed array
+                            userBelongingTo.tasks.managed.splice(userBelongingTo.tasks.managed.indexOf(thisDocument._id), 1);
+                        }
+                        // If the userBelongingTo.tasks.managed array does not exist
+                    } else {
+                        // userBelongingTo.tasks.managed will be created as an array containing this document
+                        userBelongingTo.tasks.managed = [thisDocument._id];
+                    }
+                    // Is the user does not have a TASKS object, create it and assign thisDocument to the archived array
+                } else {
+                    userBelongingTo.tasks = {
+                        managed: [],
+                        archived: [thisDocument._id],
+                        created: [],
+                        assigned: []
+                    }
+                }
+            }
+            await userBelongingTo.save();
+        } else {
+            return "MongooseMiddlewareTasksSchema - Error 404 - The User can't be found."
+        }
     } catch (error) {
         console.log(error);
         return "Error 500, this task can't be properly archived in its parent user"
@@ -182,7 +264,7 @@ TaskSchema.statics.removeEveryReferenceFromProjects = async function (thisDocume
         };
     } catch (error) {
         console.log(error);
-        return ("Task could not be permanently deleted from its parent project - error 500 - MONGOOSE pre-delete schema");
+        return ("MongooseMiddlewareTasksSchema - Error 500 - Task could not be permanently deleted from its parent project");
     }
 }
 
@@ -210,7 +292,7 @@ TaskSchema.statics.removeEveryReferenceFromUsers = async function (thisDocument)
         }
     } catch (error) {
         console.log(error);
-        return ("Task could not be permanently deleted from its parent user - error 500 - MONGOOSE pre-delete schema");
+        return ("MongooseMiddlewareTasksSchema - Error 500 - Task could not be permanently deleted from its parent user");
     }
 }
 
