@@ -11,7 +11,7 @@ async function connect() {
         .then(result => { /*console.log(result); */ })
         .catch(err => console.log("Cannot connect because of " + err));
 }
-connect().then(() => { /*console.log("Connected!") */ });
+connect().then(() => { console.log("Connected!") });
 
 const db = mongoose.connection;
 db.on('error', err => { console.log("Connection error - " + err) });

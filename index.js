@@ -8,6 +8,11 @@ const port = process.env.EXPRESS_PORT || 2001;
 const db = require('./mongodb/DBManager');
 const userRoutes = require('./routes/user');
 const projectRoutes = require('./routes/project');
+
+const cleanup = require('./utils/cleanup');
+// GOTTA FIGURE OUT HOW TO CLEANUP
+// const nodeCleanup = require('node-cleanup');
+
 const { writeStatsBeforeClosing } = require('./middleware/logging');
 
 const cors = require('cors');
@@ -19,23 +24,12 @@ app.use(cors({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const onExitStatsWriting = async function () {
-    console.log("Called exit")
-    await writeStatsBeforeClosing();
-}
-
-// catch ctrl+c event and exit normally
-process.on('SIGINT', async function () {
-    await onExitStatsWriting();
-    process.exit(2);
-});
-
-//catch uncaught exceptions, trace, then exit normally
-process.on('uncaughtException', async function (e) {
-    await errorLogging(e);
-    await onExitStatsWriting();
-    process.exit(99);
-});
+// nodeCleanup(async function (exitCode, signal) {
+//     // console.log(exitCode);
+//     // console.log(signal);
+//     console.log("nodeCleanup")
+//     await onExitStatsWriting();
+// })
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -45,9 +39,12 @@ app.use('/user', userRoutes);
 app.use('/project', projectRoutes);
 
 app.get('*', (req, res) => {
-    console.log(req.statusMessage);
-    console.log(req.url);
-    console.log(req.ip);
+
+    console.log("*********");
+    console.log(req.method);
+    console.log(req.route.path);
+    console.log("*********");
+
     res.send("API point not found, try again");
 })
 

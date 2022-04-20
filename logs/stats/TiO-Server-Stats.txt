@@ -1,2 +1,24 @@
-STATS
-Total Number Of API Calls:9
+API CALLS STATS
+This file has been written on 10:49:41 PM - Apr 20 2022
+
+User API Calls:
+    create: 0,
+    get: 0,
+    login: 0,
+    logout: 0,
+    patch: 0,
+    archive: undefined
+    
+Project API Calls:
+    get: 0,
+    create: 0
+    patch: 0
+    archive: 0
+    permantentlyDelete: 0
+
+Task API Calls:
+    get: 0
+    create: 0
+    patch: 0
+    archive: 0
+    permantentlyDelete: 0

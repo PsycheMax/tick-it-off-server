@@ -4,39 +4,39 @@ const taskController = require('../controllers/task');
 
 const auth = require('../middleware/auth');
 const decodeLoggedUser = require('../middleware/decodeLoggedUser');
-const { statsLoggingMiddleware } = require('../middleware/logging');
+const { increaseObjectValueMiddleware } = require('../middleware/logging');
 
 const router = express.Router();
 
 router.route('/')
     .get(projectController.getRoot)
-    .post(statsLoggingMiddleware, auth, decodeLoggedUser, projectController.post);
+    .post(increaseObjectValueMiddleware, auth, decodeLoggedUser, projectController.post);
 
 router.route('/:id')
-    .get(statsLoggingMiddleware, auth, decodeLoggedUser, projectController.getID)
-    .patch(statsLoggingMiddleware, auth, decodeLoggedUser, projectController.patch)
-    .delete(statsLoggingMiddleware, auth, decodeLoggedUser, projectController.deactivate);
+    .get(increaseObjectValueMiddleware, auth, decodeLoggedUser, projectController.getID)
+    .patch(increaseObjectValueMiddleware, auth, decodeLoggedUser, projectController.patch)
+    .delete(increaseObjectValueMiddleware, auth, decodeLoggedUser, projectController.deactivate);
 
 router.route('/permanentlyDelete/:id')
-    .delete(statsLoggingMiddleware, auth, decodeLoggedUser, projectController.permanentlyDelete);
+    .delete(increaseObjectValueMiddleware, auth, decodeLoggedUser, projectController.permanentlyDelete);
 
 router.route('/:id/settings')
-    .get(statsLoggingMiddleware, auth, decodeLoggedUser, projectController.getProjectSettings)
-    .post(statsLoggingMiddleware, auth, decodeLoggedUser, projectController.setProjectSettings);
+    .get(auth, decodeLoggedUser, projectController.getProjectSettings)
+    .post(auth, decodeLoggedUser, projectController.setProjectSettings);
 
 router.route('/:id/task')
-    .post(statsLoggingMiddleware, auth, decodeLoggedUser, taskController.post);
+    .post(increaseObjectValueMiddleware, auth, decodeLoggedUser, taskController.post);
 
 router.route('/:id/task/:taskid')
-    .get(statsLoggingMiddleware, auth, decodeLoggedUser, taskController.getID)
-    .patch(statsLoggingMiddleware, auth, decodeLoggedUser, taskController.patch)
-    .delete(statsLoggingMiddleware, auth, decodeLoggedUser, taskController.deactivate);
+    .get(increaseObjectValueMiddleware, auth, decodeLoggedUser, taskController.getID)
+    .patch(increaseObjectValueMiddleware, auth, decodeLoggedUser, taskController.patch)
+    .delete(increaseObjectValueMiddleware, auth, decodeLoggedUser, taskController.deactivate);
 
 router.route('/:id/task/permanentlyDelete/:taskid')
-    .delete(statsLoggingMiddleware, auth, decodeLoggedUser, taskController.permanentlyDelete);
+    .delete(increaseObjectValueMiddleware, auth, decodeLoggedUser, taskController.permanentlyDelete);
 
 router.route('/:id/task/:taskid/settings')
-    .get(statsLoggingMiddleware, auth, decodeLoggedUser, taskController.getTaskSettings)
-    .post(statsLoggingMiddleware, auth, decodeLoggedUser, taskController.setTaskSettings);
+    .get(auth, decodeLoggedUser, taskController.getTaskSettings)
+    .post(auth, decodeLoggedUser, taskController.setTaskSettings);
 
 module.exports = router;
