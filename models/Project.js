@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { errorLogging } = require('../middleware/logging');
 const formatDateNow = require('../utils/formatDateNow');
 let Tasks = require('./Task');
 let Users = require('./User');
@@ -89,6 +90,7 @@ ProjectSchema.statics.preSaveOperations = async function (thisDocument) {
             }
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         return ("Project could not be saved properly in the user lists - error 500, MONGOOSE PRE-SAVE SCHEMA");
     }
@@ -146,6 +148,7 @@ ProjectSchema.statics.preSaveOperations = async function (thisDocument) {
         })
     } catch (error) {
         console.log(error);
+        errorLogging(error);
         return ("Project could not be assigned to its user.projects arrays - error 500 - MONGOOSE pre-save schema");
     }
 }
@@ -193,6 +196,7 @@ ProjectSchema.statics.removeEveryReferenceFromUsers = async function (thisDocume
 
     } catch (error) {
         console.log(error);
+        errorLogging(error);
         return ("Project could not be properly deleted - error 500 - MONGOOSE pre-delete schema");
     }
 }
@@ -207,7 +211,6 @@ ProjectSchema.pre('deleteOne', { query: true }, async function () {
     const thisDocument = await this.model.findOne(this.getQuery());
     await ProjectSchema.statics.removeEveryReferenceFromUsers(thisDocument);
     await ProjectSchema.statics.removeEveryTaskInThisProject(thisDocument);
-
 })
 
 const Projects = mongoose.model('Projects', ProjectSchema, 'TaskManager_Project');

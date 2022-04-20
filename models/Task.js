@@ -147,6 +147,7 @@ TaskSchema.statics.preSaveOperations = async function (Projects, thisDocument) {
             return "MongooseMiddlewareTasksSchema - Error 404 - The Project can't be found.";
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         return "Error 500, can't add task to its project";
     }
@@ -235,6 +236,7 @@ TaskSchema.statics.preSaveOperations = async function (Projects, thisDocument) {
             return "MongooseMiddlewareTasksSchema - Error 404 - The User can't be found."
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         return "Error 500, this task can't be properly archived in its parent user"
     }

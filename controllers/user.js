@@ -6,6 +6,7 @@ const formatDateNow = require('../utils/formatDateNow');
 
 const jwt = require('jsonwebtoken');
 const { encrypt, compare } = require("../utils/passwordLogic");
+const { errorLogging } = require("../middleware/logging");
 
 let userController = {};
 
@@ -15,6 +16,7 @@ userController.getRoot = async function (req, res) {
         let toReturn = await Users.find({});
         res.send(toReturn);
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -34,6 +36,7 @@ userController.getID = async function (req, res) {
             res.send("User not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -83,6 +86,7 @@ userController.postNewUser = async function (req, res) {
         toReturn.password = "";
         res.status(201).json(toReturn);
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -116,6 +120,7 @@ userController.login = async function (req, res) {
             res.status(401).send("Invalid Credentials");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -137,6 +142,7 @@ userController.logout = async function (req, res) {
             res.status(200).send("Already logged out");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -180,6 +186,7 @@ userController.patch = async function (req, res) {
         }
 
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -204,6 +211,7 @@ userController.delete = async function (req, res) {
             res.status(404).send("User not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -225,6 +233,7 @@ userController.getUserSettings = async function (req, res) {
             res.status(404).send("User not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -247,6 +256,7 @@ userController.setUserSettings = async function (req, res) {
             res.status(404).send("User not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }

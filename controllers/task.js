@@ -1,3 +1,4 @@
+const { errorLogging } = require("../middleware/logging");
 const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
 const Users = require("../models/User");
@@ -37,6 +38,7 @@ taskController.getRoot = async function (req, res) {
         let toReturn = await Tasks.find({});
         res.status(200).send(toReturn);
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -60,6 +62,7 @@ taskController.getID = async function (req, res) {
             res.send("Task not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -100,6 +103,7 @@ taskController.post = async function (req, res) {
             res.status(404).send("The project you're referring to can't be found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -137,6 +141,7 @@ taskController.patch = async function (req, res) {
             res.status(404).send("The task you're referring to can't be found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -164,6 +169,7 @@ taskController.deactivate = async function (req, res) {
             res.status(404).send("The task you're referring to can't be found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -189,6 +195,7 @@ taskController.permanentlyDelete = async function (req, res) {
             res.status(404).send("The task you're referring to can't be found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -214,6 +221,7 @@ taskController.getTaskSettings = async function (req, res) {
             res.status(404).send("The task you're referring to can't be found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -242,6 +250,7 @@ taskController.setTaskSettings = async function (req, res) {
             res.status(404).send("The task you're referring to can't be found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }

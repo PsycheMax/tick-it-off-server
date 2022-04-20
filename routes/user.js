@@ -1,26 +1,29 @@
 const express = require('express');
 const userController = require('../controllers/user');
+
 const auth = require('../middleware/auth');
 const decodeLoggedUser = require('../middleware/decodeLoggedUser');
+const { statsLoggingMiddleware } = require('../middleware/logging');
+
 const router = express.Router();
 
 router.route('/')
     .get(userController.getRoot)
-    .post(userController.postNewUser);
+    .post(statsLoggingMiddleware, userController.postNewUser);
 
 router.route('/login')
-    .post(userController.login);
+    .post(statsLoggingMiddleware, userController.login);
 
 router.route('/logout')
-    .post(auth, decodeLoggedUser, userController.logout);
+    .post(statsLoggingMiddleware, auth, decodeLoggedUser, userController.logout);
 
 router.route('/:id')
-    .get(auth, decodeLoggedUser, userController.getID)
-    .patch(auth, decodeLoggedUser, userController.patch)
-    .delete(auth, decodeLoggedUser, userController.delete);
+    .get(statsLoggingMiddleware, auth, decodeLoggedUser, userController.getID)
+    .patch(statsLoggingMiddleware, auth, decodeLoggedUser, userController.patch)
+    .delete(statsLoggingMiddleware, auth, decodeLoggedUser, userController.delete);
 
 router.route('/:id/settings')
-    .get(auth, decodeLoggedUser, userController.getUserSettings)
-    .post(auth, decodeLoggedUser, userController.setUserSettings);
+    .get(statsLoggingMiddleware, auth, decodeLoggedUser, userController.getUserSettings)
+    .post(statsLoggingMiddleware, auth, decodeLoggedUser, userController.setUserSettings);
 
 module.exports = router;

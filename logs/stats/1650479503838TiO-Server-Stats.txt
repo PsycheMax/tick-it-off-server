@@ -1,0 +1,21 @@
+API CALLS STATS
+This file has been written on 06:31:43 PM - Apr 20 2022
+
+User API Calls:
+    login: 0,
+    logout: 0,
+    getUserData: 0,
+    patch: 0,
+    delete: 0
+    
+Project API Calls:
+    created: 0
+    patched: 0
+    archived: 0
+    permantentlyDeleted: 0
+
+Task API Calls:
+    created: 0
+    patched: 0
+    archived: 0
+    permantentlyDeleted: 0

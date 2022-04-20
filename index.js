@@ -5,6 +5,11 @@ const app = express();
 
 const port = process.env.EXPRESS_PORT || 2001;
 
+const db = require('./mongodb/DBManager');
+const userRoutes = require('./routes/user');
+const projectRoutes = require('./routes/project');
+const { writeStatsBeforeClosing } = require('./middleware/logging');
+
 const cors = require('cors');
 app.use(cors({
     origin: "*"
@@ -14,10 +19,23 @@ app.use(cors({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const db = require('./mongodb/DBManager');
+const onExitStatsWriting = async function () {
+    console.log("Called exit")
+    await writeStatsBeforeClosing();
+}
 
-const userRoutes = require('./routes/user');
-const projectRoutes = require('./routes/project');
+// catch ctrl+c event and exit normally
+process.on('SIGINT', async function () {
+    await onExitStatsWriting();
+    process.exit(2);
+});
+
+//catch uncaught exceptions, trace, then exit normally
+process.on('uncaughtException', async function (e) {
+    await errorLogging(e);
+    await onExitStatsWriting();
+    process.exit(99);
+});
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -26,7 +44,7 @@ app.get('/', (req, res) => {
 app.use('/user', userRoutes);
 app.use('/project', projectRoutes);
 
-app.get('/*', (req, res) => {
+app.get('*', (req, res) => {
     console.log(req.statusMessage);
     console.log(req.url);
     console.log(req.ip);

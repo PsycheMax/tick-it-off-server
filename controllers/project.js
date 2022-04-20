@@ -1,3 +1,4 @@
+const { errorLogging } = require("../middleware/logging");
 const Projects = require("../models/Project");
 const Tasks = require("../models/Task");
 const Users = require("../models/User");
@@ -41,6 +42,7 @@ projectController.getRoot = async function (req, res) {
             res.status(403).send("You lack the authorization to perform this operation");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -65,6 +67,7 @@ projectController.getID = async function (req, res) {
             res.status(404).send("Project not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -94,6 +97,7 @@ projectController.post = async function (req, res) {
         await newProject.save();
         res.status(201).send(newProject);
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -127,6 +131,7 @@ projectController.patch = async function (req, res) {
             res.status(404).send("Project not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -154,6 +159,7 @@ projectController.deactivate = async function (req, res) {
             res.send("Project not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -178,6 +184,7 @@ projectController.permanentlyDelete = async function (req, res) {
             res.send("Project not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -198,6 +205,7 @@ projectController.getProjectSettings = async function (req, res) {
             res.send("Project not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
@@ -220,6 +228,7 @@ projectController.setProjectSettings = async function (req, res) {
             res.send("User not found");
         }
     } catch (error) {
+        errorLogging(error);
         console.log(error);
         res.status(500).send(error);
     }
