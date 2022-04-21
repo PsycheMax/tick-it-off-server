@@ -16,8 +16,7 @@ userController.getRoot = async function (req, res) {
         let toReturn = await Users.find({});
         res.send(toReturn);
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In user controller - getRoot");
         res.status(500).send(error);
     }
 }
@@ -36,8 +35,7 @@ userController.getID = async function (req, res) {
             res.send("User not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In user controller - getID");
         res.status(500).send(error);
     }
 }
@@ -86,8 +84,7 @@ userController.postNewUser = async function (req, res) {
         toReturn.password = "";
         res.status(201).json(toReturn);
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In user controller - postNewUser");
         res.status(500).send(error);
     }
 }
@@ -120,8 +117,7 @@ userController.login = async function (req, res) {
             res.status(401).send("Invalid Credentials");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In user controller - login ");
         res.status(500).send(error);
     }
 }
@@ -142,8 +138,7 @@ userController.logout = async function (req, res) {
             res.status(200).send("Already logged out");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In user controller - logout");
         res.status(500).send(error);
     }
 }
@@ -186,8 +181,7 @@ userController.patch = async function (req, res) {
         }
 
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In user controller - patch");
         res.status(500).send(error);
     }
 }
@@ -211,8 +205,7 @@ userController.delete = async function (req, res) {
             res.status(404).send("User not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In user controller - delete");
         res.status(500).send(error);
     }
 }
@@ -233,8 +226,7 @@ userController.getUserSettings = async function (req, res) {
             res.status(404).send("User not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In user controller - getUserSettings");
         res.status(500).send(error);
     }
 }
@@ -256,8 +248,7 @@ userController.setUserSettings = async function (req, res) {
             res.status(404).send("User not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In user controller - setUserSettings");
         res.status(500).send(error);
     }
 }

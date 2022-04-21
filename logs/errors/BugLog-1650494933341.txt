@@ -1,3 +1,0 @@
-ERROR - 10:48:53 PM - Apr 20 2022 
-
-Error: Error: ENOENT: no such file or directory, open '/home/max/Coding/Web/task-manager/server/logs/stats/TiO-Server-Stats.JSON'

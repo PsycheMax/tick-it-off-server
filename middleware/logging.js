@@ -4,24 +4,31 @@ const path = require('path');
 const formatDateNow = require('../utils/formatDateNow');
 
 const mainLogLocation = path.join(__dirname, "../", "logs");
-
-const errorLogCreation = function (error) {
-    return (
-        `ERROR - ${formatDateNow()} \n
-Error: ${error}`)
-}
 const errorsFolder = "errors";
-const errorFilename = `BugLog-${Date.now()}.txt`
-
-const errorLogging = function (error) {
-    let targetFile = path.join(mainLogLocation, errorsFolder, errorFilename);
-    fs.writeFile(targetFile, errorLogCreation(error), "utf8", (err) => { console.log(err) });
-}
-
 const statsFolder = "stats";
 
+let fileExtension = ".log";
+
+
+const errorLogFormatting = function (error, optionalInfo) {
+    return (
+        `ERROR - ${formatDateNow()}
+${optionalInfo} \n
+Error: ${error}`)
+}
+
+const errorFilename = `BugLog-${Date.now()}${fileExtension}`
+
+const errorLogging = function (error, optionalInfo) {
+    let optionalInfo = optionalInfo ? optionalInfo : "";
+    let targetFile = path.join(mainLogLocation, errorsFolder, errorFilename);
+    fs.writeFile(targetFile, errorLogFormatting(error, optionalInfo), "utf8", (err) => { console.log(err) });
+}
+
+
+
 let statsFilename = "TiO-Server-Stats"
-let fileExtension = ".txt";
+
 
 let JSONFilePath = path.join(mainLogLocation, statsFolder, statsFilename + ".JSON");
 let readableFilePath = path.join(mainLogLocation, statsFolder, statsFilename + fileExtension);

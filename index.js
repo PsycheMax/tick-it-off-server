@@ -5,23 +5,21 @@ const app = express();
 
 const port = process.env.EXPRESS_PORT || 2001;
 
+const cors = require('cors');
+
 const db = require('./mongodb/DBManager');
+
 const userRoutes = require('./routes/user');
 const projectRoutes = require('./routes/project');
-
 const cleanup = require('./utils/cleanup');
 
-const { writeStatsBeforeClosing } = require('./middleware/logging');
-
-const cors = require('cors');
 app.use(cors({
-    origin: "*"
+    origin: true,
+    optionsSuccessStatus: 200
 }));
-
 // The following is basically body-parser - it allows me to parse the req.body object as a JSON object in the controller methods.
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 
 app.get('/', (req, res) => {
     res.send('Hello World!');

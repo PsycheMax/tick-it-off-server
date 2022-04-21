@@ -15,6 +15,6 @@ module.exports = async function (req, res, next) {
             return null;
         }
     } catch (error) {
-        errorLogging(error);
+        errorLogging(error, "In decodeLoggedUser");
     }
 }

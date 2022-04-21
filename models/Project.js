@@ -90,8 +90,7 @@ ProjectSchema.statics.preSaveOperations = async function (thisDocument) {
             }
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "in Project model, pre-saveOperations");
         return ("Project could not be saved properly in the user lists - error 500, MONGOOSE PRE-SAVE SCHEMA");
     }
     // The following part of the middleware cycles through the users in the project.users.managers and puts this Project in the "projects.archived" or "projects.managed" arrays, depending on its own "active" status;
@@ -147,8 +146,7 @@ ProjectSchema.statics.preSaveOperations = async function (thisDocument) {
             await foundUser.save();
         })
     } catch (error) {
-        console.log(error);
-        errorLogging(error);
+        errorLogging(error, "in Project model, pre-saveOperations, pt2");
         return ("Project could not be assigned to its user.projects arrays - error 500 - MONGOOSE pre-save schema");
     }
 }
@@ -195,8 +193,7 @@ ProjectSchema.statics.removeEveryReferenceFromUsers = async function (thisDocume
 
 
     } catch (error) {
-        console.log(error);
-        errorLogging(error);
+        errorLogging(error, "in Project model, removeEveryReferenceFromUsers");
         return ("Project could not be properly deleted - error 500 - MONGOOSE pre-delete schema");
     }
 }

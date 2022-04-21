@@ -42,8 +42,7 @@ projectController.getRoot = async function (req, res) {
             res.status(403).send("You lack the authorization to perform this operation");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In project controller - getRoot");
         res.status(500).send(error);
     }
 }
@@ -67,8 +66,7 @@ projectController.getID = async function (req, res) {
             res.status(404).send("Project not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In project controller - getID");
         res.status(500).send(error);
     }
 }
@@ -97,8 +95,7 @@ projectController.post = async function (req, res) {
         await newProject.save();
         res.status(201).send(newProject);
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In project controller - post");
         res.status(500).send(error);
     }
 }
@@ -131,8 +128,7 @@ projectController.patch = async function (req, res) {
             res.status(404).send("Project not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In project controller - patch");
         res.status(500).send(error);
     }
 }
@@ -159,8 +155,7 @@ projectController.deactivate = async function (req, res) {
             res.send("Project not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In project controller - deactivate");
         res.status(500).send(error);
     }
 }
@@ -184,8 +179,7 @@ projectController.permanentlyDelete = async function (req, res) {
             res.send("Project not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In project controller - permanentlyDelete");
         res.status(500).send(error);
     }
 }
@@ -205,8 +199,7 @@ projectController.getProjectSettings = async function (req, res) {
             res.send("Project not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In project controller - getProjectSettings");
         res.status(500).send(error);
     }
 }
@@ -228,8 +221,7 @@ projectController.setProjectSettings = async function (req, res) {
             res.send("User not found");
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
+        errorLogging(error, "In project controller - setProjectSettings");
         res.status(500).send(error);
     }
 }

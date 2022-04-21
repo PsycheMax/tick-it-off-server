@@ -89,8 +89,8 @@ TaskSchema.statics.preSaveOperations = async function (Projects, thisDocument) {
             }
         }
     } catch (error) {
-        console.log(error);
-        return "Error 500, can't add the Task to its users";
+        errorLogging(error, "in Task model, preSaveOperations pt1");
+        return "MongooseMiddlewareTasksSchema - Error 500 - can't add the Task to its users";
     }
     // The following part of the middleware checks the project in task.project and puts this Task in its "tasks.archived" or "tasks.managed" arrays, depending on the task own "active" status;
     try {
@@ -147,9 +147,8 @@ TaskSchema.statics.preSaveOperations = async function (Projects, thisDocument) {
             return "MongooseMiddlewareTasksSchema - Error 404 - The Project can't be found.";
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
-        return "Error 500, can't add task to its project";
+        errorLogging(error, "in Task model, preSaveOperations pt2");
+        return "MongooseMiddlewareTasksSchema - Error 500 - can't add task to its project";
     }
     try {
         // The following part of the middleware checks the user in task.users.creators[0] and puts this Task in its "tasks.archived" or "tasks.managed" arrays, depending on the task own "active" status;
@@ -236,9 +235,8 @@ TaskSchema.statics.preSaveOperations = async function (Projects, thisDocument) {
             return "MongooseMiddlewareTasksSchema - Error 404 - The User can't be found."
         }
     } catch (error) {
-        errorLogging(error);
-        console.log(error);
-        return "Error 500, this task can't be properly archived in its parent user"
+        errorLogging(error, "in Task model, preSaveOperations pt3");
+        return "MongooseMiddlewareTasksSchema - Error 500 - this task can't be properly archived in its parent user"
     }
 }
 
@@ -265,7 +263,7 @@ TaskSchema.statics.removeEveryReferenceFromProjects = async function (thisDocume
             })
         };
     } catch (error) {
-        console.log(error);
+        errorLogging(error, "in Task model, removeEveryReferenceFromProjects");
         return ("MongooseMiddlewareTasksSchema - Error 500 - Task could not be permanently deleted from its parent project");
     }
 }
@@ -293,7 +291,7 @@ TaskSchema.statics.removeEveryReferenceFromUsers = async function (thisDocument)
             }
         }
     } catch (error) {
-        console.log(error);
+        errorLogging(error, "in Task model, removeEveryReferenceFromUsers");
         return ("MongooseMiddlewareTasksSchema - Error 500 - Task could not be permanently deleted from its parent user");
     }
 }

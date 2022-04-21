@@ -1,1 +1,1 @@
-{"user":{"create":0,"login":0,"logout":0,"get":0,"patch":0,"archive":0},"project":{"get":0,"create":0,"patch":0,"archive":0,"permantentlyDelete":0},"task":{"get":0,"create":0,"patch":0,"archive":0,"permantentlyDelete":0}}
+{"user":{"create":0,"login":0,"logout":0,"get":2,"patch":0,"archive":0},"project":{"get":3,"create":0,"patch":0,"archive":0,"permantentlyDelete":0},"task":{"get":0,"create":0,"patch":0,"archive":0,"permantentlyDelete":0}}
