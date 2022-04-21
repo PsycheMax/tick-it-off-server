@@ -10,8 +10,6 @@ const userRoutes = require('./routes/user');
 const projectRoutes = require('./routes/project');
 
 const cleanup = require('./utils/cleanup');
-// GOTTA FIGURE OUT HOW TO CLEANUP
-// const nodeCleanup = require('node-cleanup');
 
 const { writeStatsBeforeClosing } = require('./middleware/logging');
 
@@ -24,12 +22,6 @@ app.use(cors({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// nodeCleanup(async function (exitCode, signal) {
-//     // console.log(exitCode);
-//     // console.log(signal);
-//     console.log("nodeCleanup")
-//     await onExitStatsWriting();
-// })
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
