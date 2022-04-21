@@ -20,15 +20,12 @@ Error: ${error}`)
 const errorFilename = `BugLog-${Date.now()}${fileExtension}`
 
 const errorLogging = function (error, optionalInfo) {
-    let optionalInfo = optionalInfo ? optionalInfo : "";
+    optionalInfo = optionalInfo ? optionalInfo : "";
     let targetFile = path.join(mainLogLocation, errorsFolder, errorFilename);
     fs.writeFile(targetFile, errorLogFormatting(error, optionalInfo), "utf8", (err) => { console.log(err) });
 }
 
-
-
 let statsFilename = "TiO-Server-Stats"
-
 
 let JSONFilePath = path.join(mainLogLocation, statsFolder, statsFilename + ".JSON");
 let readableFilePath = path.join(mainLogLocation, statsFolder, statsFilename + fileExtension);
@@ -107,7 +104,6 @@ Task API Calls:
 
 function createJSONStatsFile() {
     let toReturn = JSON.stringify(statsToWrite);
-    console.log(toReturn)
     return toReturn;
 }
 
