@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.route('/')
     .get(userController.getRoot)
-    .post(increaseObjectValueMiddleware.bind(this, "user", "create"), userController.postNewUser);
+    .post(increaseObjectValueMiddleware, userController.postNewUser);
 
 router.route('/login')
     .post(increaseObjectValueMiddleware, userController.login);

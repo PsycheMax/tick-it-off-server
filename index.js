@@ -6,9 +6,10 @@ const cors = require('cors');
 const app = express();
 const port = process.env.EXPRESS_PORT || 2001;
 
-// app.use(cors());
 app.use(cors({
-    origin: "http://maxpace.ns0.it:8425",
+    origin: "*",
+    // For dev purposes, origin will be set to *
+    // origin: "http://maxpace.ns0.it:8425",
     optionsSuccessStatus: 200
 }));
 
