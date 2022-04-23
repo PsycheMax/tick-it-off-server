@@ -9,7 +9,12 @@ const statsFolder = "stats";
 
 let fileExtension = ".log";
 
-
+/**
+ * Error formatting function - it creates a string that is formatted in a humanly readable way
+ * @param {*} error 
+ * @param {string} optionalInfo 
+ * @returns a humanly readable formatted string containing the error data, a timestamp and the {optionalInfo} string
+ */
 const errorLogFormatting = function (error, optionalInfo) {
     return (
         `ERROR - ${formatDateNow()}
@@ -19,6 +24,11 @@ Error: ${error}`)
 
 const errorFilename = `BugLog-${Date.now()}${fileExtension}`
 
+/**
+ * Writes a file containing the error data, in the logs folder.
+ * @param {*} error 
+ * @param {*} optionalInfo string containing more info
+ */
 const errorLogging = function (error, optionalInfo) {
     optionalInfo = optionalInfo ? optionalInfo : "";
     let targetFile = path.join(mainLogLocation, errorsFolder, errorFilename);
@@ -30,6 +40,7 @@ let statsFilename = "TiO-Server-Stats"
 let JSONFilePath = path.join(mainLogLocation, statsFolder, statsFilename + ".JSON");
 let readableFilePath = path.join(mainLogLocation, statsFolder, statsFilename + fileExtension);
 
+// If there are no stats available, this JSON object will become a JSON file.
 let emptyJSON = {
     user: {
         create: 0,
@@ -56,6 +67,9 @@ let emptyJSON = {
 };
 let statsToWrite = emptyJSON;
 
+/**
+ * This function checks if there is any existing JSON stats file about the app - if there is one, it'll be set as statsToWrite - if not, the emptyJSON object will be used instead
+ */
 const JSONExistingData = async function () {
     try {
         let jsonInFile = await fsPromises.readFile(JSONFilePath);
@@ -73,6 +87,10 @@ const JSONExistingData = async function () {
 }
 JSONExistingData().then(() => { createReadableStatsFile() });
 
+/**
+ * This function creates a humanly readable file, to be then exported as a .log file
+ * @returns a humanly readable formatted string
+ */
 function createReadableStatsFile() {
     return (
         `API CALLS STATS
@@ -102,11 +120,22 @@ Task API Calls:
 `)
 }
 
+/**
+ * This function simply stringifies an object.
+ * @returns a JSON.stringify() version of stats toWrite
+ */
 function createJSONStatsFile() {
-    let toReturn = JSON.stringify(statsToWrite);
-    return toReturn;
+    return JSON.stringify(statsToWrite);
 }
 
+/**
+ * The stats in this file will be collected by this middleware. It parses the req object, to understand automatically which stats are to be increased.
+ * e.g. if the req is "PATCH /user/:id" the stat increased will be {user:{patch:user.patch+=1}}
+ * In case of no errors, it goes to the next() express function
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 module.exports.increaseObjectValueMiddleware = async function (req, res, next) {
     let category = req.baseUrl.slice(1, req.baseUrl.length);
     if (category === "project") {
@@ -165,6 +194,12 @@ module.exports.increaseObjectValueMiddleware = async function (req, res, next) {
     next();
 }
 
+/**
+ * To avoid overwhelming the disk this app is running on, the stats will be saved to the physical disk only when the app is closed. 
+ * This is possible ONLY because stats here are not business critical, on the contrary, I'm collecting them for fun. 
+ * If they were, this is most definitely NOT a smart way to deal with them.
+ * This function saves two files: a readable one, and a JSON one. The JSON file is then used, when the app is restarted, as a basis to increase the values.
+ */
 module.exports.writeStatsBeforeClosing = async function () {
     console.log("writing stats");
 

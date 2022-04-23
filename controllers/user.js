@@ -10,17 +10,6 @@ const { errorLogging } = require("../middleware/logging");
 
 let userController = {};
 
-userController.getRoot = async function (req, res) {
-    let toReturn = "Get User Page";
-    try {
-        let toReturn = await Users.find({});
-        res.send(toReturn);
-    } catch (error) {
-        errorLogging(error, "In user controller - getRoot");
-        res.status(500).send(error);
-    }
-}
-
 userController.getID = async function (req, res) {
     const { id } = req.params;
     try {
@@ -188,9 +177,6 @@ userController.patch = async function (req, res) {
 
 userController.delete = async function (req, res) {
     const { id } = req.params;
-
-    // MOST PROBABLY in the long-run it's safer to just change the status of the entry, instead of deleting it, but I'll keep this around just in case
-
     try {
         const toDelete = await Users.findById(id);
         if (toDelete) {

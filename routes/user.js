@@ -8,7 +8,6 @@ const { increaseObjectValueMiddleware } = require('../middleware/logging');
 const router = express.Router();
 
 router.route('/')
-    .get(userController.getRoot)
     .post(increaseObjectValueMiddleware, userController.postNewUser);
 
 router.route('/login')
