@@ -5,6 +5,12 @@ const Users = require("../models/User");
 
 const formatDateNow = require('../utils/formatDateNow');
 
+/**
+ * This function checks if the loggedUser is authorized to just read the project
+ * @param {*} project 
+ * @param {*} loggedUser 
+ * @returns A boolean
+ */
 function canLoggedUserReadThis(project, loggedUser) {
     for (const key in project.users) {
         if (Object.hasOwnProperty.call(project.users, key)) {
@@ -19,6 +25,12 @@ function canLoggedUserReadThis(project, loggedUser) {
         }
     }
 }
+/**
+ * This function checks if the loggedUser is authorized to manage the project (therefore edit it)
+ * @param {*} project 
+ * @param {*} loggedUser 
+ * @returns a boolean
+ */
 function canLoggedUserManageThis(project, loggedUser) {
     const managersArray = project.users["managers"];
     for (let i = 0; i < managersArray.length; i++) {
@@ -30,23 +42,10 @@ function canLoggedUserManageThis(project, loggedUser) {
     return false;
 }
 
+// An empty object, to which every function(to be associated with routes) is added, is declared here
 let projectController = {};
 
-projectController.getRoot = async function (req, res) {
-    let toReturn = "Get Project Page";
-    try {
-        let toReturn = await Projects.find({});
-        if (toReturn) {
-            res.status(200).send(toReturn);
-        } else {
-            res.status(403).send("You lack the authorization to perform this operation");
-        }
-    } catch (error) {
-        errorLogging(error, "In project controller - getRoot");
-        res.status(500).send(error);
-    }
-}
-
+// Bear in mind that the task routes look like this "/project/:id"
 projectController.getID = async function (req, res) {
     const { id } = req.params;
     try {
@@ -162,9 +161,6 @@ projectController.deactivate = async function (req, res) {
 
 projectController.permanentlyDelete = async function (req, res) {
     const { id } = req.params;
-
-    // MOST PROBABLY in the long-run it's safer to just change the status of the entry, instead of deleting it, but I'll keep this around just in case
-
     try {
         const toDelete = await Projects.findById(id);
 

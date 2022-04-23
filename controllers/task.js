@@ -5,6 +5,12 @@ const Users = require("../models/User");
 
 const formatDateNow = require('../utils/formatDateNow');
 
+/**
+ * This function checks if the loggedUser is authorized to just read the task
+ * @param {*} task 
+ * @param {*} loggedUser 
+ * @returns A boolean
+ */
 function canLoggedUserReadThis(task, loggedUser) {
     for (const key in task.users) {
         if (Object.hasOwnProperty.call(task.users, key)) {
@@ -19,6 +25,13 @@ function canLoggedUserReadThis(task, loggedUser) {
         }
     }
 }
+
+/**
+ * This function checks if the loggedUser is authorized to manage the task (therefore edit it)
+ * @param {*} task 
+ * @param {*} loggedUser 
+ * @returns a boolean
+ */
 function canLoggedUserManageThis(task, loggedUser) {
     const managersArray = task.users["managers"];
     for (let i = 0; i < managersArray.length; i++) {
@@ -29,20 +42,10 @@ function canLoggedUserManageThis(task, loggedUser) {
     }
     return false;
 }
-
+// An empty object, to which every function(to be associated with routes) is added, is declared here
 let taskController = {};
 
-taskController.getRoot = async function (req, res) {
-    let toReturn = "Get Task Page";
-    try {
-        let toReturn = await Tasks.find({});
-        res.status(200).send(toReturn);
-    } catch (error) {
-        errorLogging(error, "In task controller - getRoot");
-        res.status(500).send(error);
-    }
-}
-
+// Bear in mind that the tasks routes look like: /project/:projectID/task/:taskID
 taskController.getID = async function (req, res) {
     const { id: projectID, taskid: taskID } = req.params;
     try {
