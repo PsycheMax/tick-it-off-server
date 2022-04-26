@@ -118,6 +118,7 @@ taskController.patch = async function (req, res) {
             .populate("users.creators", "username image active")
             .populate("users.joiners", "username image active")
             .populate("users.managers", "username image active");
+
         const projectBelongingTo = await Projects.findById(projectID);
         if (toUpdate) {
             if (projectBelongingTo) {

@@ -92,6 +92,8 @@ TaskSchema.statics.preSaveOperations = async function (Projects, thisDocument) {
         errorLogging(error, "in Task model, preSaveOperations pt1");
         return "MongooseMiddlewareTasksSchema - Error 500 - can't add the Task to its users";
     }
+
+
     // The following part of the middleware checks the project in task.project and puts this Task in its "tasks.archived" or "tasks.managed" arrays, depending on the task own "active" status;
     try {
         const projectBelongingTo = await Projects.findById(thisDocument.project);
@@ -126,12 +128,13 @@ TaskSchema.statics.preSaveOperations = async function (Projects, thisDocument) {
                     // If this task is not found in said array of archived tasks
                     if (projectBelongingTo.archivedTasks.indexOf(thisDocument._id) === -1) {
                         // Add this task to the array
-                        projectBelongingTo.archivedTasks = [...projectBelongingTo.archivedTasks, thisDocument._id];
-                        // If an array of archived tasks is not found
-                    } else {
-                        // Create an array of archived tasks in the project and add one element, this task
-                        projectBelongingTo.archivedTasks = [thisDocument._id];
+                        projectBelongingTo.archivedTasks = [...projectBelongingTo.archivedTasks, thisDocument._id]
                     }
+                    // If an array of archived tasks is not found
+                } else {
+                    // Create an array of archived tasks in the project and add one element, this task
+                    projectBelongingTo.archivedTasks = [thisDocument._id];
+
                 }
                 // If the project has an array of working tasks
                 if (projectBelongingTo.tasks) {

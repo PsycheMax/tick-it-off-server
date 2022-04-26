@@ -9,3 +9,5 @@ logs/
 *.log
 *.env
 /logs/stats/
+/logs/*
+/logs/stats/TiO-Server-Stats.JSON
