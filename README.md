@@ -1,4 +1,4 @@
-# tick-it-off-server
+# Tick It Off - Backend Server
 The Backend server for Tick-It-Off
 
 ## NodeJS, Express, MongoDB (Via Mongoose)
